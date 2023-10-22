@@ -1,0 +1,11 @@
+Model Information:
+* title:	Animal Crossing map
+* source:	https://sketchfab.com/3d-models/animal-crossing-map-9f53cb8a02134037887875e022b2eae2
+* author:	Loupyboy (https://sketchfab.com/loupyboy)
+
+Model License:
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Animal Crossing map" (https://sketchfab.com/3d-models/animal-crossing-map-9f53cb8a02134037887875e022b2eae2) by Loupyboy (https://sketchfab.com/loupyboy) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)

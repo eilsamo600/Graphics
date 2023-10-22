@@ -1,0 +1,11 @@
+Model Information:
+* title:	Animal Crossing Apple Tree
+* source:	https://sketchfab.com/3d-models/animal-crossing-apple-tree-2ed2a55eebbb4b4fb60484390f611d20
+* author:	damien_max59 (https://sketchfab.com/damienbouchez59)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Animal Crossing Apple Tree" (https://sketchfab.com/3d-models/animal-crossing-apple-tree-2ed2a55eebbb4b4fb60484390f611d20) by damien_max59 (https://sketchfab.com/damienbouchez59) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

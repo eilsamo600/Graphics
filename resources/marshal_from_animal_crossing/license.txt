@@ -1,0 +1,11 @@
+Model Information:
+* title:	Marshal from Animal Crossing
+* source:	https://sketchfab.com/3d-models/marshal-from-animal-crossing-f8f54c51d4a24d84bd4b8319ac384daa
+* author:	inksidze (https://sketchfab.com/inksidze)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Marshal from Animal Crossing" (https://sketchfab.com/3d-models/marshal-from-animal-crossing-f8f54c51d4a24d84bd4b8319ac384daa) by inksidze (https://sketchfab.com/inksidze) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

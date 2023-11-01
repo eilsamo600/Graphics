@@ -1,3 +1,12 @@
+import * as THREE from '../node_modules/three/build/three.module.js'
+import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js"
+
+import {third_person_camera} from './third-person-camera.js';
+import {entity_manager} from './entity-manager.js';
+import {player_entity} from './player-entity.js'
+import {entity} from './entity.js';
+import {player_input} from './player-input.js';
+
 const _VS = `
 varying vec3 vWorldPosition;
 
@@ -71,7 +80,7 @@ class AnimalCrossing {
 
     this._scene.fog.color.copy(uniforms["bottomColor"].value);
 
-    const skyGeo = new THREE.SphereBufferGeometry(1000, 32, 15);
+    const skyGeo = new THREE.SphereGeometry(1000, 32, 15);
     const skyMat = new THREE.ShaderMaterial({
       uniforms: uniforms,
       vertexShader: _VS,
@@ -84,7 +93,8 @@ class AnimalCrossing {
 
     this._previousRAF = null;
     this._RAF();
-
+    this._entityManager = new entity_manager.EntityManager();
+    
 	this._loadMap();
 	this._LoadCharacterModel(); 
   }
@@ -104,12 +114,12 @@ class AnimalCrossing {
       this._RAF();
 
       this._threejs.render(this._scene, this._camera);
-    //   this._Step(t - this._previousRAF);
+      // this._Step(t - this._previousRAF);
       this._previousRAF = t;
     });
   }
   _loadMap() {
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
 
     // Load the GLTF model
     loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
@@ -125,19 +135,23 @@ class AnimalCrossing {
     });
   }
   _LoadCharacterModel() {
-    const loader = new THREE.GLTFLoader();
+    const params = {
+      camera: this._camera,
+      scene: this._scene,
+    };
 
-    // Load the character GLTF model
-    loader.load('resources/marshal_from_animal_crossing/scene.gltf', (gltf) => {
-      const character = gltf.scene;
+    const player = new entity.Entity();
+    player.AddComponent(new player_input.BasicCharacterControllerInput(params));
+    player.AddComponent(new player_entity.BasicCharacterController(params));
 
-      // Adjust the position to place the character above the map
-      character.position.set(30, 1, 0); // Modify the position as needed
-
-      // Add the character to the scene
-      this._scene.add(character);
-
-    });
+    this._entityManager.Add(player, 'player');
+    
+    const camera = new entity.Entity();
+    camera.AddComponent(
+        new third_person_camera.ThirdPersonCamera({
+            camera: this._camera,
+            target: this._entityManager.Get('player')}));
+    this._entityManager.Add(camera, 'player-camera');
   }
 
 }

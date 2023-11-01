@@ -1,15 +1,19 @@
-
+<!DOCTYPE html>
 <html>
-<script type="text/javascript" src="js/three.min.js"></script>
-<script type="text/javascript" src="js/GLTFLoader.js"></script>		
-<script type="text/javascript" src="js/OrbitControls.js"></script>		
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="importmap">
+            {
+        "imports":{
+            "three": "./node_modules/three/build/three.module.js"
+        }   
+    }
 
+    </script>
+    <script type="module" src = "./src/main.js" defer></script>
+</head>
 <body>
-    <script src="./src/main.js" type="module"></script>
-    <div class="container" id="container">
-        
-    </div>
-</canvas>
-
+    <div id = "container"></div>
+    <div id = "controls"></div>
 </body>
-</html>  
+</html>

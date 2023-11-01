@@ -1,29 +1,9 @@
-import * as THREE from '../node_modules/three/build/three.module.js'
-import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js"
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js"
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 
-const _VS = `
-varying vec3 vWorldPosition;
+import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
+import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
 
-void main() {
-  vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-  vWorldPosition = worldPosition.xyz;
-
-  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-}`;
-
-const _FS = `
-uniform vec3 topColor;
-uniform vec3 bottomColor;
-uniform float offset;
-uniform float exponent;
-
-varying vec3 vWorldPosition;
-
-void main() {
-  float h = normalize( vWorldPosition + offset ).y;
-  gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
-}`;
 
 class BasicCharacterControllerProxy {
   constructor(animations) {
@@ -50,17 +30,21 @@ class BasicCharacterController {
     this._animations = {};
     this._input = new BasicCharacterControllerInput();
     this._stateMachine = new CharacterFSM(
-      new BasicCharacterControllerProxy(this._animations));
+        new BasicCharacterControllerProxy(this._animations));
 
     this._LoadModels();
   }
 
-
   _LoadModels() {
-    const loader = new GLTFLoader();
-    loader.load('./resources/marshal/marshal.glb', (glb) => {
+    const loader = new FBXLoader();
+    loader.setPath('./resources/zombie/');
+    loader.load('mremireh_o_desbiens.fbx', (fbx) => {
+      fbx.scale.setScalar(0.1);
+      fbx.traverse(c => {
+        c.castShadow = true;
+      });
 
-      this._target = glb;
+      this._target = fbx;
       this._params.scene.add(this._target);
 
       this._mixer = new THREE.AnimationMixer(this._target);
@@ -73,13 +57,18 @@ class BasicCharacterController {
       const _OnLoad = (animName, anim) => {
         const clip = anim.animations[0];
         const action = this._mixer.clipAction(clip);
-
+  
         this._animations[animName] = {
           clip: clip,
           action: action,
         };
       };
 
+      const loader = new FBXLoader(this._manager);
+      loader.setPath('./resources/zombie/');
+      loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
+      loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
+  
     });
   }
 
@@ -92,13 +81,13 @@ class BasicCharacterController {
 
     const velocity = this._velocity;
     const frameDecceleration = new THREE.Vector3(
-      velocity.x * this._decceleration.x,
-      velocity.y * this._decceleration.y,
-      velocity.z * this._decceleration.z
+        velocity.x * this._decceleration.x,
+        velocity.y * this._decceleration.y,
+        velocity.z * this._decceleration.z
     );
     frameDecceleration.multiplyScalar(timeInSeconds);
     frameDecceleration.z = Math.sign(frameDecceleration.z) * Math.min(
-      Math.abs(frameDecceleration.z), Math.abs(velocity.z));
+        Math.abs(frameDecceleration.z), Math.abs(velocity.z));
 
     velocity.add(frameDecceleration);
 
@@ -162,7 +151,7 @@ class BasicCharacterController {
 
 class BasicCharacterControllerInput {
   constructor() {
-    this._Init();
+    this._Init();    
   }
 
   _Init() {
@@ -192,11 +181,17 @@ class BasicCharacterControllerInput {
       case 68: // d
         this._keys.right = true;
         break;
+      case 32: // SPACE
+        this._keys.space = true;
+        break;
+      case 16: // SHIFT
+        this._keys.shift = true;
+        break;
     }
   }
 
   _onKeyUp(event) {
-    switch (event.keyCode) {
+    switch(event.keyCode) {
       case 87: // w
         this._keys.forward = false;
         break;
@@ -208,6 +203,12 @@ class BasicCharacterControllerInput {
         break;
       case 68: // d
         this._keys.right = false;
+        break;
+      case 32: // SPACE
+        this._keys.space = false;
+        break;
+      case 16: // SHIFT
+        this._keys.shift = false;
         break;
     }
   }
@@ -226,7 +227,7 @@ class FiniteStateMachine {
 
   SetState(name) {
     const prevState = this._currentState;
-
+    
     if (prevState) {
       if (prevState.Name == name) {
         return;
@@ -267,9 +268,9 @@ class State {
     this._parent = parent;
   }
 
-  Enter() { }
-  Exit() { }
-  Update() { }
+  Enter() {}
+  Exit() {}
+  Update() {}
 };
 
 
@@ -357,7 +358,7 @@ class IdleState extends State {
 };
 
 
-class AnimalCrossing {
+class CharacterControllerDemo {
   constructor() {
     this._Initialize();
   }
@@ -367,19 +368,16 @@ class AnimalCrossing {
       antialias: true,
     });
     this._threejs.outputEncoding = THREE.sRGBEncoding;
-    this._threejs.gammaFactor = 2.2;
     this._threejs.shadowMap.enabled = true;
     this._threejs.shadowMap.type = THREE.PCFSoftShadowMap;
     this._threejs.setPixelRatio(window.devicePixelRatio);
     this._threejs.setSize(window.innerWidth, window.innerHeight);
-    this._threejs.domElement.id = 'threejs';
 
-    document.getElementById('container').appendChild(this._threejs.domElement);
+    document.body.appendChild(this._threejs.domElement);
 
     window.addEventListener('resize', () => {
       this._OnWindowResize();
     }, false);
-
 
     const fov = 60;
     const aspect = 1920 / 1080;
@@ -390,46 +388,99 @@ class AnimalCrossing {
 
     this._scene = new THREE.Scene();
 
+    let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+    light.position.set(-100, 100, 100);
+    light.target.position.set(0, 0, 0);
+    light.castShadow = true;
+    light.shadow.bias = -0.001;
+    light.shadow.mapSize.width = 4096;
+    light.shadow.mapSize.height = 4096;
+    light.shadow.camera.near = 0.1;
+    light.shadow.camera.far = 500.0;
+    light.shadow.camera.near = 0.5;
+    light.shadow.camera.far = 500.0;
+    light.shadow.camera.left = 50;
+    light.shadow.camera.right = -50;
+    light.shadow.camera.top = 50;
+    light.shadow.camera.bottom = -50;
+    this._scene.add(light);
+
+    light = new THREE.AmbientLight(0xFFFFFF, 0.25);
+    this._scene.add(light);
+
     const controls = new OrbitControls(
       this._camera, this._threejs.domElement);
     controls.target.set(0, 10, 0);
     controls.update();
 
-    this._scene = new THREE.Scene();
-    this._scene.background = new THREE.Color(0xFFFFFF);
-    this._scene.fog = new THREE.FogExp2(0x89b2eb, 0.002);
+    const loader = new THREE.CubeTextureLoader();
+    const texture = loader.load([
+        './resources/posx.jpg',
+        './resources/negx.jpg',
+        './resources/posy.jpg',
+        './resources/negy.jpg',
+        './resources/posz.jpg',
+        './resources/negz.jpg',
+    ]);
+    texture.encoding = THREE.sRGBEncoding;
+    this._scene.background = texture;
 
-    const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
-    hemiLight.color.setHSL(0.6, 1, 0.6);
-    hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-    this._scene.add(hemiLight);
+    const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(100, 100, 10, 10),
+        new THREE.MeshStandardMaterial({
+            color: 0x808080,
+          }));
+    plane.castShadow = false;
+    plane.receiveShadow = true;
+    plane.rotation.x = -Math.PI / 2;
+    this._scene.add(plane);
 
-    const uniforms = {
-      "topColor": { value: new THREE.Color(0x0077ff) },
-      "bottomColor": { value: new THREE.Color(0xffffff) },
-      "offset": { value: 33 },
-      "exponent": { value: 0.6 }
-    };
-    uniforms["topColor"].value.copy(hemiLight.color);
-
-    this._scene.fog.color.copy(uniforms["bottomColor"].value);
-
-    const skyGeo = new THREE.SphereGeometry(1000, 32, 15);
-    const skyMat = new THREE.ShaderMaterial({
-      uniforms: uniforms,
-      vertexShader: _VS,
-      fragmentShader: _FS,
-      side: THREE.BackSide
-    });
-
-    const sky = new THREE.Mesh(skyGeo, skyMat);
-    this._scene.add(sky);
-
+    this._mixers = [];
     this._previousRAF = null;
-    this._RAF();
+
     this._LoadAnimatedModel();
-    this._loadMap();
+    this._RAF();
   }
+
+  _LoadAnimatedModel() {
+    const params = {
+      camera: this._camera,
+      scene: this._scene,
+    }
+    this._controls = new BasicCharacterController(params);
+  }
+
+  _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
+    const loader = new FBXLoader();
+    loader.setPath(path);
+    loader.load(modelFile, (fbx) => {
+      fbx.scale.setScalar(0.1);
+      fbx.traverse(c => {
+        c.castShadow = true;
+      });
+      fbx.position.copy(offset);
+
+      const anim = new FBXLoader();
+      anim.setPath(path);
+      anim.load(animFile, (anim) => {
+        const m = new THREE.AnimationMixer(fbx);
+        this._mixers.push(m);
+        const idle = m.clipAction(anim.animations[0]);
+        idle.play();
+      });
+      this._scene.add(fbx);
+    });
+  }
+
+  // _LoadModel() {
+  //   const loader = new GLTFLoader();
+  //   loader.load('./resources/thing.glb', (gltf) => {
+  //     gltf.scene.traverse(c => {
+  //       c.castShadow = true;
+  //     });
+  //     this._scene.add(gltf.scene);
+  //   });
+  // }
 
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
@@ -451,30 +502,6 @@ class AnimalCrossing {
     });
   }
 
-  _loadMap() {
-    const loader = new GLTFLoader();
-    // Load the GLTF model
-    loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
-      const model = gltf.scene;
-
-      // Adjust the position, scale, or rotation as needed
-      model.position.set(-50, 0, 50);
-      model.scale.set(100, 100, 100);
-      model.rotation.set(0, 0, 0);
-
-      // Add the model to the scene
-      this._scene.add(model);
-    });
-  }
-
-  _LoadAnimatedModel() {
-    const params = {
-      camera: this._camera,
-      scene: this._scene,
-    }
-    this._controls = new BasicCharacterController(params);
-  }
-
   _Step(timeElapsed) {
     const timeElapsedS = timeElapsed * 0.001;
     if (this._mixers) {
@@ -485,11 +512,11 @@ class AnimalCrossing {
       this._controls.Update(timeElapsedS);
     }
   }
-
 }
+
 
 let _APP = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-  _APP = new AnimalCrossing();
+  _APP = new CharacterControllerDemo();
 });

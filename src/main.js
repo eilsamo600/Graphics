@@ -48,6 +48,7 @@ class BasicCharacterController {
     this._velocity = new THREE.Vector3(0, 0, 0);
 
     this._animations = {};
+
     this._input = new BasicCharacterControllerInput();
     this._stateMachine = new CharacterFSM(
       new BasicCharacterControllerProxy(this._animations));
@@ -58,27 +59,33 @@ class BasicCharacterController {
 
   _LoadModels() {
     const loader = new GLTFLoader();
-    loader.load('./resources/marshal/marshal.glb', (glb) => {
+    loader.load('../resources/marshal/marshal.glb', (gltf) => {
 
-      this._target = glb;
+      this._target = gltf.scene;
+      this._target .position.set(0, 1, 0);
       this._params.scene.add(this._target);
 
-      this._mixer = new THREE.AnimationMixer(this._target);
+      const mixer = new THREE.AnimationMixer(this._target);   
+      const gltfAnimation = gltf.animations;
+      const animationMap = {};
 
-      this._manager = new THREE.LoadingManager();
-      this._manager.onLoad = () => {
-        this._stateMachine.SetState('idle');
-      };
+      gltfAnimation.forEach(animationClip => {
+        const name = animationClip.name;
+        console.log(name);
+        animationMap[name] = animationClip;
+        
+        const animationAction = mixer.clipAction(animationClip);
+        animationMap[name] = animationAction;
+      });
 
-      const _OnLoad = (animName, anim) => {
-        const clip = anim.animations[0];
-        const action = this._mixer.clipAction(clip);
+      this._animationMap = animationMap;
+      this._mixer = mixer;
 
-        this._animations[animName] = {
-          clip: clip,
-          action: action,
-        };
-      };
+      
+      // this._stateMachine.SetState('idle');
+      console.log(this._animationMap);
+      this._currentAnimationAction = this._animationMap["walk01"];
+      this._currentAnimationAction.play();
 
     });
   }
@@ -108,13 +115,6 @@ class BasicCharacterController {
     const _R = controlObject.quaternion.clone();
 
     const acc = this._acceleration.clone();
-    if (this._input._keys.shift) {
-      acc.multiplyScalar(2.0);
-    }
-
-    if (this._stateMachine._currentState.Name == 'dance') {
-      acc.multiplyScalar(0.0);
-    }
 
     if (this._input._keys.forward) {
       velocity.z += acc.z * timeInSeconds;
@@ -171,8 +171,6 @@ class BasicCharacterControllerInput {
       backward: false,
       left: false,
       right: false,
-      space: false,
-      shift: false,
     };
     document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
     document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
@@ -211,8 +209,7 @@ class BasicCharacterControllerInput {
         break;
     }
   }
-};
-
+}
 
 class FiniteStateMachine {
   constructor() {
@@ -284,20 +281,17 @@ class WalkState extends State {
   }
 
   Enter(prevState) {
-    const curAction = this._parent._proxy._animations['walk'].action;
+    console.log("WalkState로 진입");
+    const curAction = this._animationMap["walk"].play();
+    console.log(curAction);
     if (prevState) {
       const prevAction = this._parent._proxy._animations[prevState.Name].action;
 
       curAction.enabled = true;
 
-      if (prevState.Name == 'run') {
-        const ratio = curAction.getClip().duration / prevAction.getClip().duration;
-        curAction.time = prevAction.time * ratio;
-      } else {
-        curAction.time = 0.0;
-        curAction.setEffectiveTimeScale(1.0);
-        curAction.setEffectiveWeight(1.0);
-      }
+      curAction.time = 0.0;
+      curAction.setEffectiveTimeScale(1.0);
+      curAction.setEffectiveWeight(1.0);
 
       curAction.crossFadeFrom(prevAction, 0.5, true);
       curAction.play();
@@ -330,7 +324,10 @@ class IdleState extends State {
   }
 
   Enter(prevState) {
-    const idleAction = this._parent._proxy._animations['idle'].action;
+    console.log("지금 idle");
+    console.log(this._parent._proxy._animations);
+    const idleAction = this._animationMap["walk"];
+    idleAction.play
     if (prevState) {
       const prevAction = this._parent._proxy._animations[prevState.Name].action;
       idleAction.time = 0.0;
@@ -350,8 +347,6 @@ class IdleState extends State {
   Update(_, input) {
     if (input._keys.forward || input._keys.backward) {
       this._parent.SetState('walk');
-    } else if (input._keys.space) {
-      this._parent.SetState('dance');
     }
   }
 };

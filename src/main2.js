@@ -25,16 +25,6 @@ void main() {
   gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
 }`;
 
-class BasicCharacterControllerProxy {
-  constructor(animations) {
-    this._animations = animations;
-  }
-
-  get animations() {
-    return this._animations;
-  }
-};
-
 
 class BasicCharacterController {
   constructor(params) {
@@ -47,15 +37,12 @@ class BasicCharacterController {
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
 
-    this._animations = {};
-
+    this._animations = {}; // 미리 빈 객체로 초기화
     this._LoadModels();
-
-    
 
     this._input = new BasicCharacterControllerInput();
     this._stateMachine = new CharacterFSM(
-      new BasicCharacterControllerProxy(this._animations));
+      this._animations);
 
     
   }
@@ -74,7 +61,7 @@ class BasicCharacterController {
       gltfAnimation.forEach(animationClip => {
         const name = animationClip.name;
         console.log(name);
-        this._animations[name] = animationClip;
+        this._animations[name] = animationClip; // animationMap 대신 this._animations에 할당
         const animationAction = this._mixer.clipAction(animationClip);
         this._animations[name] = animationAction;
       });
@@ -210,14 +197,17 @@ class FiniteStateMachine {
   constructor() {
     this._states = {};
     this._currentState = null;
+    this._animations = null;
   }
 
-  _AddState(name, type) {
+  _AddState(name, type, animations) {
     this._states[name] = type;
+    this._animations = animations;
   }
 
   SetState(name) {
     const prevState = this._currentState;
+    const animations = this._animations;
 
     if (prevState) {
       if (prevState.Name == name) {
@@ -229,7 +219,7 @@ class FiniteStateMachine {
     const state = new this._states[name](this);
 
     this._currentState = state;
-    state.Enter(prevState);
+    state.Enter(prevState, animations);
   }
 
   Update(timeElapsed, input) {
@@ -241,15 +231,15 @@ class FiniteStateMachine {
 
 
 class CharacterFSM extends FiniteStateMachine {
-  constructor(proxy) {
+  constructor(animations) {
     super();
-    this._proxy = proxy;
+    this._animations = animations;
     this._Init();
   }
 
   _Init() {
-    this._AddState('idle', IdleState);
-    this._AddState('walk', WalkState);
+    this._AddState('idle', IdleState, this._animations);
+    this._AddState('walk', WalkState, this._animations);
   }
 };
 
@@ -275,22 +265,28 @@ class WalkState extends State {
     return 'walk';
   }
 
-  Enter(prevState) {
-    const curAction = this._animations["walk01"];
-    if (prevState) {
-      const prevAction = this._animations[prevState.Name].action;
+  changeAnimation(curAction, prevAction) {
+    const previousAnimationAction = prevAction;
+    this._currentAnimationAction = curAction;
 
-      curAction.enabled = true;
-
-      curAction.time = 0.0;
-      curAction.setEffectiveTimeScale(1.0);
-      curAction.setEffectiveWeight(1.0);
-
-      curAction.crossFadeFrom(prevAction, 0.5, true);
-      curAction.play();
-    } else {
+    if(previousAnimationAction !== this._currentAnimationAction) {
+        previousAnimationAction.fadeOut(0.5);
+        this._currentAnimationAction.reset().fadeIn(0.5).play();
+    }
+  }
+  Enter(prevState, animations) {
+    console.log("WalkState로 진입");
+    const curAction = animations["walk01"];
+    console.log(curAction);
+    if(prevState){
+      console.log(prevState.name);
+      const prevAction = animations["walk"];
+      this.changeAnimation(curAction, prevAction)
+      // curAction.play();
+    }else{
       curAction.play();
     }
+
   }
 
   Exit() {
@@ -316,19 +312,29 @@ class IdleState extends State {
     return 'idle';
   }
 
-  Enter(prevState) {
-    const idleAction = this._animations["walk"];
+  changeAnimation(idleAction, prevAction) {
+    const previousAnimationAction = prevAction;
+    this._currentAnimationAction = idleAction;
+
+    if(previousAnimationAction !== this._currentAnimationAction) {
+        previousAnimationAction.fadeOut(0.5);
+        this._currentAnimationAction.reset().fadeIn(0.5).play();
+    }
+}
+
+  Enter(prevState, animations) {
+    console.log("지금 idle");
+    const idleAction = animations["walk"];
+    console.log(idleAction);
     if (prevState) {
-      const prevAction = this._parent._proxy._animations[prevState.Name].action;
-      idleAction.time = 0.0;
-      idleAction.enabled = true;
-      idleAction.setEffectiveTimeScale(1.0);
-      idleAction.setEffectiveWeight(1.0);
-      idleAction.crossFadeFrom(prevAction, 0.5, true);
-      idleAction.play();
+      const prevAction = animations["walk01"];
+      console.log("123123123");
+      this.changeAnimation(idleAction,prevAction);
     } else {
+      console.log("4444444");
       idleAction.play();
     }
+
   }
 
   Exit() {
@@ -438,14 +444,16 @@ class AnimalCrossing {
 
   _loadMap() {
     const loader = new GLTFLoader();
-    
+    // Load the GLTF model
     loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
       const model = gltf.scene;
 
+      // Adjust the position, scale, or rotation as needed
       model.position.set(-50, 0, 50);
       model.scale.set(100, 100, 100);
       model.rotation.set(0, 0, 0);
 
+      // Add the model to the scene
       this._scene.add(model);
     });
   }

@@ -49,39 +49,44 @@ class BasicCharacterController {
 
     this._animations = {};
 
-    this._LoadModels();
-
-    
-
     this._input = new BasicCharacterControllerInput();
     this._stateMachine = new CharacterFSM(
       new BasicCharacterControllerProxy(this._animations));
 
-    
+    this._LoadModels();
   }
 
 
   _LoadModels() {
     const loader = new GLTFLoader();
     loader.load('../resources/marshal/marshal.glb', (gltf) => {
+
       this._target = gltf.scene;
-      this._target.position.set(0, 1, 0);
+      this._target .position.set(0, 1, 0);
       this._params.scene.add(this._target);
 
-      this._mixer = new THREE.AnimationMixer(this._target);
+      const mixer = new THREE.AnimationMixer(this._target);   
       const gltfAnimation = gltf.animations;
+      const animationMap = {};
 
       gltfAnimation.forEach(animationClip => {
         const name = animationClip.name;
         console.log(name);
-        this._animations[name] = animationClip;
-        const animationAction = this._mixer.clipAction(animationClip);
-        this._animations[name] = animationAction;
+        animationMap[name] = animationClip;
+        
+        const animationAction = mixer.clipAction(animationClip);
+        animationMap[name] = animationAction;
       });
 
-      console.log(this._animations);
+      this._animationMap = animationMap;
+      this._mixer = mixer;
 
-      this._stateMachine.SetState('idle');
+      
+      // this._stateMachine.SetState('idle');
+      console.log(this._animationMap);
+      this._currentAnimationAction = this._animationMap["walk01"];
+      this._currentAnimationAction.play();
+
     });
   }
 
@@ -276,9 +281,11 @@ class WalkState extends State {
   }
 
   Enter(prevState) {
-    const curAction = this._animations["walk01"];
+    console.log("WalkState로 진입");
+    const curAction = this._animationMap["walk"].play();
+    console.log(curAction);
     if (prevState) {
-      const prevAction = this._animations[prevState.Name].action;
+      const prevAction = this._parent._proxy._animations[prevState.Name].action;
 
       curAction.enabled = true;
 
@@ -317,7 +324,10 @@ class IdleState extends State {
   }
 
   Enter(prevState) {
-    const idleAction = this._animations["walk"];
+    console.log("지금 idle");
+    console.log(this._parent._proxy._animations);
+    const idleAction = this._animationMap["walk"];
+    idleAction.play
     if (prevState) {
       const prevAction = this._parent._proxy._animations[prevState.Name].action;
       idleAction.time = 0.0;
@@ -438,14 +448,16 @@ class AnimalCrossing {
 
   _loadMap() {
     const loader = new GLTFLoader();
-    
+    // Load the GLTF model
     loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
       const model = gltf.scene;
 
+      // Adjust the position, scale, or rotation as needed
       model.position.set(-50, 0, 50);
       model.scale.set(100, 100, 100);
       model.rotation.set(0, 0, 0);
 
+      // Add the model to the scene
       this._scene.add(model);
     });
   }

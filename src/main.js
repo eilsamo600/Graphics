@@ -36,10 +36,9 @@ class BasicCharacterController {
     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
-
-    this._animations = {}; // 미리 빈 객체로 초기화
+    this.target = null;
+    this._animations = {};
     this._LoadModels();
-
     this._input = new BasicCharacterControllerInput();
     this._stateMachine = new CharacterFSM(
       this._animations);
@@ -51,29 +50,31 @@ class BasicCharacterController {
   _LoadModels() {
     const loader = new GLTFLoader();
     loader.load('../resources/marshal/marshal.glb', (gltf) => {
-      this._target = gltf.scene;
-      this._target.position.set(0, 1, 0);
-      this._params.scene.add(this._target);
+      this.target = gltf.scene;
 
-      this._mixer = new THREE.AnimationMixer(this._target);
+      this.target.position.set(0, 1, 0);
+      this._params.scene.add(this.target);
+      // this.target = gltf.scene;
+      // console.log(this.target);
+
+
+      this._mixer = new THREE.AnimationMixer(this.target);
       const gltfAnimation = gltf.animations;
 
       gltfAnimation.forEach(animationClip => {
         const name = animationClip.name;
-        console.log(name);
-        this._animations[name] = animationClip; // animationMap 대신 this._animations에 할당
+        // console.log(name);
+        this._animations[name] = animationClip;
         const animationAction = this._mixer.clipAction(animationClip);
         this._animations[name] = animationAction;
       });
-
-      console.log(this._animations);
 
       this._stateMachine.SetState('idle');
     });
   }
 
   Update(timeInSeconds) {
-    if (!this._target) {
+    if (this.target == null) {
       return;
     }
 
@@ -90,8 +91,8 @@ class BasicCharacterController {
       Math.abs(frameDecceleration.z), Math.abs(velocity.z));
 
     velocity.add(frameDecceleration);
-
-    const controlObject = this._target;
+    
+    const controlObject = this.target;
     const _Q = new THREE.Quaternion();
     const _A = new THREE.Vector3();
     const _R = controlObject.quaternion.clone();
@@ -275,14 +276,10 @@ class WalkState extends State {
     }
   }
   Enter(prevState, animations) {
-    console.log("WalkState로 진입");
     const curAction = animations["walk01"];
-    console.log(curAction);
     if(prevState){
-      console.log(prevState.name);
       const prevAction = animations["walk"];
       this.changeAnimation(curAction, prevAction)
-      // curAction.play();
     }else{
       curAction.play();
     }
@@ -323,15 +320,11 @@ class IdleState extends State {
 }
 
   Enter(prevState, animations) {
-    console.log("지금 idle");
     const idleAction = animations["walk"];
-    console.log(idleAction);
     if (prevState) {
       const prevAction = animations["walk01"];
-      console.log("123123123");
       this.changeAnimation(idleAction,prevAction);
     } else {
-      console.log("4444444");
       idleAction.play();
     }
 
@@ -347,6 +340,40 @@ class IdleState extends State {
   }
 };
 
+class ThirdPersonCamera {
+  constructor(params ){
+    this._params = params; 
+    this._camera = params.camera;
+
+    this._currentPosition = new THREE.Vector3();
+    this._currentLookat = new THREE.Vector3();
+  }
+
+  _CaculateIdealOffset(target){
+    const idealOffset = new THREE.Vector3(0, 10, -25);
+    idealOffset.applyQuaternion(target.quaternion);
+    idealOffset.add(target.position);
+    return idealOffset;
+  }
+
+  _CaculateIdealLookat(target){
+    const idealLookat = new THREE.Vector3(0,0,15);
+    idealLookat.applyQuaternion(target.quaternion);
+    idealLookat.add(target.position);
+    return idealLookat;
+  }
+
+  Update(timeElapsed, target){
+    const idealOffset = this._CaculateIdealOffset(target);
+    const idealLookat = this._CaculateIdealLookat(target); 
+
+    this._currentPosition.copy(idealOffset);
+    this._currentLookat.copy(idealLookat);
+    
+    this._camera.position.copy(this._currentPosition);
+    this._camera.lookAt(this._currentLookat);
+  }
+}
 
 class AnimalCrossing {
   constructor() {
@@ -371,7 +398,6 @@ class AnimalCrossing {
       this._OnWindowResize();
     }, false);
 
-
     const fov = 60;
     const aspect = 1920 / 1080;
     const near = 1.0;
@@ -380,13 +406,13 @@ class AnimalCrossing {
     this._camera.position.set(25, 10, 25);
 
     this._scene = new THREE.Scene();
+    // const controls = new OrbitControls(
+    //   this._camera, this._threejs.domElement);
+    // controls.target.set(0, 10, 0);
+    // controls.update();
 
-    const controls = new OrbitControls(
-      this._camera, this._threejs.domElement);
-    controls.target.set(0, 10, 0);
-    controls.update();
 
-    this._scene = new THREE.Scene();
+    // this._scene = new THREE.Scene();
     this._scene.background = new THREE.Color(0xFFFFFF);
     this._scene.fog = new THREE.FogExp2(0x89b2eb, 0.002);
 
@@ -417,9 +443,13 @@ class AnimalCrossing {
     this._scene.add(sky);
 
     this._previousRAF = null;
-    this._RAF();
-    this._LoadAnimatedModel();
+    
     this._loadMap();
+    this._LoadAnimatedModel();
+    this._thirdPersonCamera = new ThirdPersonCamera({
+      camera: this._camera,
+    });
+    this._RAF();
   }
 
   _OnWindowResize() {
@@ -444,16 +474,14 @@ class AnimalCrossing {
 
   _loadMap() {
     const loader = new GLTFLoader();
-    // Load the GLTF model
+    
     loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
       const model = gltf.scene;
 
-      // Adjust the position, scale, or rotation as needed
       model.position.set(-50, 0, 50);
       model.scale.set(100, 100, 100);
       model.rotation.set(0, 0, 0);
 
-      // Add the model to the scene
       this._scene.add(model);
     });
   }
@@ -464,6 +492,7 @@ class AnimalCrossing {
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
+    
   }
 
   _Step(timeElapsed) {
@@ -475,8 +504,10 @@ class AnimalCrossing {
     if (this._controls) {
       this._controls.Update(timeElapsedS);
     }
+    if(this._controls.target != null){
+      this._thirdPersonCamera.Update(timeElapsedS,this._controls.target);
+    }
   }
-
 }
 
 let _APP = null;

@@ -1,6 +1,12 @@
+/**
+ * Original code
+ * https://github.com/simondevyoutube/
+ */
+
 import * as THREE from '../node_modules/three/build/three.module.js'
 import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js"
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js"
+import {ExtrudeGeometry, Shape, Vector2} from "three";
 
 const _VS = `
 varying vec3 vWorldPosition;
@@ -54,16 +60,12 @@ class BasicCharacterController {
 
       this.target.position.set(0, 1, 0);
       this._params.scene.add(this.target);
-      // this.target = gltf.scene;
-      // console.log(this.target);
-
 
       this._mixer = new THREE.AnimationMixer(this.target);
       const gltfAnimation = gltf.animations;
 
       gltfAnimation.forEach(animationClip => {
         const name = animationClip.name;
-        // console.log(name);
         this._animations[name] = animationClip;
         const animationAction = this._mixer.clipAction(animationClip);
         this._animations[name] = animationAction;
@@ -320,7 +322,8 @@ class IdleState extends State {
 }
 
   Enter(prevState, animations) {
-    const idleAction = animations["walk"];
+    // I made idle action name as walk and real walk aniation name "walk01"
+    const idleAction = animations["walk"]; 
     if (prevState) {
       const prevAction = animations["walk01"];
       this.changeAnimation(idleAction,prevAction);
@@ -375,6 +378,28 @@ class ThirdPersonCamera {
   }
 }
 
+/* 안쓸 예정
+class PrismGeometry extends THREE.ExtrudeGeometry {
+  constructor(vertices, height) {
+      const shape = new THREE.Shape();
+
+      (function f(ctx) {
+          ctx.moveTo(vertices[0].x, vertices[0].y);
+          for (let i = 1; i < vertices.length; i++) {
+              ctx.lineTo(vertices[i].x, vertices[i].y);
+          }
+          ctx.lineTo(vertices[0].x, vertices[0].y);
+      })(shape);
+
+      const settings = {
+          amount: height,
+          bevelEnabled: false,
+      };
+
+      super(shape, settings);
+  }
+}*/
+
 class AnimalCrossing {
   constructor() {
     this._Initialize();
@@ -406,13 +431,7 @@ class AnimalCrossing {
     this._camera.position.set(25, 10, 25);
 
     this._scene = new THREE.Scene();
-    // const controls = new OrbitControls(
-    //   this._camera, this._threejs.domElement);
-    // controls.target.set(0, 10, 0);
-    // controls.update();
 
-
-    // this._scene = new THREE.Scene();
     this._scene.background = new THREE.Color(0xFFFFFF);
     this._scene.fog = new THREE.FogExp2(0x89b2eb, 0.002);
 
@@ -439,6 +458,21 @@ class AnimalCrossing {
       side: THREE.BackSide
     });
 
+    const prismVertices = [
+      new THREE.Vector2(0, 0),
+      new THREE.Vector2(20, 0),
+      new THREE.Vector2(20, 20),
+    ];
+    
+    const prismHeight = 2; // Set the desired height
+    const prismGeometry = new PrismGeometry(prismVertices, prismHeight);
+    
+    const prismMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const prismMesh = new THREE.Mesh(prismGeometry, prismMaterial);
+    prismMesh.position.set(41, 1, -28.3); // Set the position
+    // rotation left 90 degree
+    prismMesh.rotateY(Math.PI / 2); // Rotate 90 degrees counterclockwise (left)
+
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
 
@@ -452,6 +486,7 @@ class AnimalCrossing {
     this._RAF();
   }
 
+  
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
     this._camera.updateProjectionMatrix();
@@ -504,8 +539,9 @@ class AnimalCrossing {
     if (this._controls) {
       this._controls.Update(timeElapsedS);
     }
+
     if(this._controls.target != null){
-      this._thirdPersonCamera.Update(timeElapsedS,this._controls.target);
+      this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
     }
   }
 }
@@ -515,3 +551,9 @@ let _APP = null;
 window.addEventListener('DOMContentLoaded', () => {
   _APP = new AnimalCrossing();
 });
+
+// 오르막 좌표 x= 41, y = 1, z = -28.3
+// 방향 -3.14 , 0 , -3.14
+
+// 도착지 x = 41, y = 3, z = -45
+// 방향 -3.14 , 1.361 , -3.14

@@ -1,10 +1,7 @@
-let canvas; // 캔버스 엘리먼트를 변수로 선언합니다.
-let context; // 캔버스 컨텍스트를 변수로 선언합니다.
 
 window.onload = function init() {
 
 	const canvas = document.getElementById("gl-canvas");
-
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
@@ -32,9 +29,9 @@ window.onload = function init() {
 
 	controls.enableRotate = false; //마우스로 움직이는거 안함
 	controls.enableZoom = false; //마우스로 확대축소 안함
-<<<<<<< Updated upstream
+
 	let plane
-=======
+
 
 	// create an AudioListener and add it to the camera
 	const listener = new THREE.AudioListener();
@@ -53,7 +50,6 @@ window.onload = function init() {
 		//sound.play();
 	});
 
->>>>>>> Stashed changes
 	const loader = new THREE.GLTFLoader();
 	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
@@ -159,12 +155,8 @@ window.onload = function init() {
 
 			//console.log(plane.position.x);
 
-<<<<<<< Updated upstream
 			// plane.position.x가 원하는 위치에 도달하면 interval을 종료
 			if (plane.position.x >= 120) {
-=======
-			if (plane.position.x >= 80) {
->>>>>>> Stashed changes
 				clearInterval(interval2);
 			}
 		}, 23);
@@ -176,4 +168,5 @@ window.onload = function init() {
 
 
 }
+
 

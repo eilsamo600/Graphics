@@ -99,7 +99,7 @@ window.onload = function init() {
 
 		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
-		canvas.id = "startText";
+
 		const textWidth = context.measureText(text).width;
 		const textX = canvas.width / 7.5;
 		const textY = canvas.height / 8;
@@ -118,36 +118,33 @@ window.onload = function init() {
 
 
 		if (event.buttons == 1 && plane) {
-			const startText = document.getElementById("startText");
-			if (startText) {
-				startText.style.display = "none";
 
-				sound.play();
-				isSoundPlaying = false;
+			sound.play();
+			isSoundPlaying = false;
 
-				// 마우스 이벤트 리스너 제거
-				window.removeEventListener('mousemove', handleMouseMove);
+			// 마우스 이벤트 리스너 제거
+			window.removeEventListener('mousemove', handleMouseMove);
 
 
-				const interval1StartTime = Date.now();
+			const interval1StartTime = Date.now();
 
-				const interval1 = setInterval(() => {
-					plane.position.x -= planeSpeed * 0.3;
+			const interval1 = setInterval(() => {
+				plane.position.x -= planeSpeed * 0.3;
 
-					//console.log(plane.position.y);
+				//console.log(plane.position.y);
 
-					// plane.position.x가 원하는 위치에 도달하면 interval을 종료
-					if (plane.position.x <= -37) {
-						clearInterval(interval1);
-						const interval1EndTime = Date.now() + 1000;
-						const interval1Duration = interval1EndTime - interval1StartTime;
-						setTimeout(() => {
-							startSecondInterval();
-							isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
-						}, interval1Duration);
-					}
-				}, 23);
-			}
+				// plane.position.x가 원하는 위치에 도달하면 interval을 종료
+				if (plane.position.x <= -37) {
+					clearInterval(interval1);
+					const interval1EndTime = Date.now() + 1000;
+					const interval1Duration = interval1EndTime - interval1StartTime;
+					setTimeout(() => {
+						startSecondInterval();
+						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
+					}, interval1Duration);
+				}
+			}, 23);
+
 		}
 
 
@@ -182,9 +179,8 @@ window.onload = function init() {
 
 
 		// 마우스 이벤트를 감지하고 위의 함수를 호출
-		window.addEventListener('mousemove', handleMouseMove);
 
 
 	}
-
-
+	window.addEventListener('mousemove', handleMouseMove);
+}

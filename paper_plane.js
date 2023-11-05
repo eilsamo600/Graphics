@@ -116,7 +116,6 @@ window.onload = function init() {
 		event.preventDefault();
 
 
-
 		if (event.buttons == 1 && plane) {
 
 			sound.play();

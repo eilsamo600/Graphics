@@ -114,77 +114,77 @@ window.onload = function init() {
 
 	function handleMouseMove(event) {
 		event.preventDefault();
-		if (event.buttons == 1 && plane) {
-			sound.play();
-			isSoundPlaying = false;
-		}
+
+
 
 		if (event.buttons == 1 && plane) {
 			const startText = document.getElementById("startText");
 			if (startText) {
 				startText.style.display = "none";
-			}
-			const interval1StartTime = Date.now();
-
-			const interval1 = setInterval(() => {
-				plane.position.x -= planeSpeed * 0.3;
-
-				//console.log(plane.position.y);
-
-				// plane.position.x가 원하는 위치에 도달하면 interval을 종료
-				if (plane.position.x <= -37) {
-					clearInterval(interval1);
-					const interval1EndTime = Date.now() + 1000;
-					const interval1Duration = interval1EndTime - interval1StartTime;
-					setTimeout(() => {
-						startSecondInterval();
-						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
-					}, interval1Duration);
-				}
-			}, 23);
-		}
-	}
-
-
-	function startSecondInterval() {
-		plane.rotation.y = Math.PI / 1.7;
-		plane.rotation.z = Math.PI / -2.5;
-		plane.position.x = -27
-		plane.position.y -= 3;
-		plane.position.z += 15;
-		camera.position.y = 12;
-		camera.position.z = 13;
-
-		const interval2 = setInterval(() => {
-
-			if (plane.position.x == -27) {
 
 				sound.play();
 				isSoundPlaying = false;
+
+				// 마우스 이벤트 리스너 제거
+				window.removeEventListener('mousemove', handleMouseMove);
+
+
+				const interval1StartTime = Date.now();
+
+				const interval1 = setInterval(() => {
+					plane.position.x -= planeSpeed * 0.3;
+
+					//console.log(plane.position.y);
+
+					// plane.position.x가 원하는 위치에 도달하면 interval을 종료
+					if (plane.position.x <= -37) {
+						clearInterval(interval1);
+						const interval1EndTime = Date.now() + 1000;
+						const interval1Duration = interval1EndTime - interval1StartTime;
+						setTimeout(() => {
+							startSecondInterval();
+							isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
+						}, interval1Duration);
+					}
+				}, 23);
 			}
-
-			plane.position.x += planeSpeed * 0.3;
-			plane.position.y += planeSpeed * 0.02;
-			plane.position.z -= planeSpeed * 0.2;
+		}
 
 
-			//console.log(plane.position.x);
+		function startSecondInterval() {
+			plane.rotation.y = Math.PI / 1.7;
+			plane.rotation.z = Math.PI / -2.5;
+			plane.position.x = -27
+			plane.position.y -= 3;
+			plane.position.z += 15;
+			camera.position.y = 12;
+			camera.position.z = 13;
 
-			// plane.position.x가 원하는 위치에 도달하면 interval을 종료
-			if (plane.position.x >= 120) {
-				clearInterval(interval2);
-			}
-		}, 23);
+			const interval2 = setInterval(() => {
 
-		// 마우스 이벤트 리스너 제거
-		window.removeEventListener('mousemove', handleMouseMove);
+				if (isSoundPlaying) {
+					sound.play();
+					isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
+				}
+
+				plane.position.x += planeSpeed * 0.3;
+				plane.position.y += planeSpeed * 0.02;
+				plane.position.z -= planeSpeed * 0.2;
+
+				//console.log(plane.position.x);
+
+				if (plane.position.x >= 120) {
+					clearInterval(interval2);
+				}
+			}, 23);
+
+		}
+
+
+		// 마우스 이벤트를 감지하고 위의 함수를 호출
+		window.addEventListener('mousemove', handleMouseMove);
+
+
 	}
-
-
-	// 마우스 이벤트를 감지하고 위의 함수를 호출
-	window.addEventListener('mousemove', handleMouseMove);
-
-
-}
 
 

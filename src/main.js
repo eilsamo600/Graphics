@@ -6,7 +6,6 @@
 import * as THREE from '../node_modules/three/build/three.module.js'
 import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js"
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js"
-import {ExtrudeGeometry, Shape, Vector2} from "three";
 
 const _VS = `
 varying vec3 vWorldPosition;
@@ -75,7 +74,7 @@ class BasicCharacterController {
     });
   }
 
-  Update(timeInSeconds) {
+  Update(timeInSeconds, check) {
     if (this.target == null) {
       return;
     }
@@ -103,6 +102,9 @@ class BasicCharacterController {
 
     if (this._input._keys.forward) {
       velocity.z += acc.z * timeInSeconds;
+      if(check){
+        velocity.z = 0;
+      }
     }
     if (this._input._keys.backward) {
       velocity.z -= acc.z * timeInSeconds;
@@ -134,7 +136,13 @@ class BasicCharacterController {
     sideways.multiplyScalar(velocity.x * timeInSeconds);
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
-    controlObject.position.add(forward);
+    console.log(check);
+    if(check == 1){
+      return;
+    }else{
+      controlObject.position.add(forward); 
+    }
+    
     controlObject.position.add(sideways);
 
     oldPosition.copy(controlObject.position);
@@ -322,8 +330,7 @@ class IdleState extends State {
   }
 
   Enter(prevState, animations) {
-    // I made idle action name as walk and real walk aniation name "walk01"
-    const idleAction = animations["walk"]; 
+    const idleAction = animations["walk"];
     if (prevState) {
       const prevAction = animations["walk01"];
       this.changeAnimation(idleAction, prevAction);
@@ -377,28 +384,6 @@ class ThirdPersonCamera {
     this._camera.lookAt(this._currentLookat);
   }
 }
-
-/* 안쓸 예정
-class PrismGeometry extends THREE.ExtrudeGeometry {
-  constructor(vertices, height) {
-      const shape = new THREE.Shape();
-
-      (function f(ctx) {
-          ctx.moveTo(vertices[0].x, vertices[0].y);
-          for (let i = 1; i < vertices.length; i++) {
-              ctx.lineTo(vertices[i].x, vertices[i].y);
-          }
-          ctx.lineTo(vertices[0].x, vertices[0].y);
-      })(shape);
-
-      const settings = {
-          amount: height,
-          bevelEnabled: false,
-      };
-
-      super(shape, settings);
-  }
-}*/
 
 class AnimalCrossing {
   constructor() {
@@ -458,21 +443,6 @@ class AnimalCrossing {
       side: THREE.BackSide
     });
 
-    const prismVertices = [
-      new THREE.Vector2(0, 0),
-      new THREE.Vector2(20, 0),
-      new THREE.Vector2(20, 20),
-    ];
-    
-    const prismHeight = 2; // Set the desired height
-    const prismGeometry = new PrismGeometry(prismVertices, prismHeight);
-    
-    const prismMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const prismMesh = new THREE.Mesh(prismGeometry, prismMaterial);
-    prismMesh.position.set(41, 1, -28.3); // Set the position
-    // rotation left 90 degree
-    prismMesh.rotateY(Math.PI / 2); // Rotate 90 degrees counterclockwise (left)
-
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
 
@@ -487,7 +457,6 @@ class AnimalCrossing {
 
   }
 
-  
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
     this._camera.updateProjectionMatrix();
@@ -534,83 +503,85 @@ class AnimalCrossing {
 
   _Step(timeElapsed) {
     const timeElapsedS = timeElapsed * 0.001;
+    this.check = 0;
     if (this._mixers) {
       this._mixers.map(m => m.update(timeElapsedS));
     }
 
-    if (this._controls) {
-      this._controls.Update(timeElapsedS);
-    }
-
     if (this._controls.target != null) {
+      //update thirdPersonCamera
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
+
+      //ray for ground
       const raycaster = new THREE.Raycaster();
       const characterPosition = this._controls.target.position;
-      raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0)); // Cast a ray downward
+      raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0));
 
-      // Check for intersections with the map mesh
       const intersections = raycaster.intersectObject(this.model);
-
-      console.log(intersections);
 
       if (intersections.length > 0) {
         const collisionPoint = intersections[0].point;
         const distanceToGround = characterPosition.distanceTo(collisionPoint);
 
-        // Clamping distanceToGround between 1 and 2
         const minDistance = 1;
         const maxDistance = 1;
         const clampedDistance = THREE.MathUtils.clamp(distanceToGround, minDistance, maxDistance);
 
-        // Adjust the character's height to stay within the range
         const targetHeight = characterPosition.y + (clampedDistance - distanceToGround);
         this._controls.target.position.y = targetHeight;
 
-        console.log('Clamped Distance to ground:', clampedDistance);
+        // console.log('Clamped Distance to ground:', clampedDistance);
       } else {
-        // No intersections, move the character up by 0.1 units
         this._controls.target.position.y += 0.1;
       }
 
-    const frontRaycaster = new THREE.Raycaster();
-    const backRaycaster = new THREE.Raycaster();
+      //Ray for front and back
+      const frontRaycaster = new THREE.Raycaster();
+      const backRaycaster = new THREE.Raycaster();
 
-    // 레이 방향 설정
-    const frontRayDirection = new THREE.Vector3(0, 0, 1); // 캐릭터의 앞쪽 방향
-    const backRayDirection = new THREE.Vector3(0, 0, -1); // 캐릭터의 뒤쪽 방향
+      const frontRayDirection = new THREE.Vector3(0, 0, 1);
+      frontRayDirection.applyQuaternion(this._controls.target.quaternion);
 
-    // Raycaster를 설정하고 교차점을 얻습니다.
-    frontRaycaster.set(characterPosition, frontRayDirection);
-    const frontIntersections = frontRaycaster.intersectObject(this.model);
+      const backRayDirection = new THREE.Vector3(0, 0, -1);
+      backRayDirection.applyQuaternion(this._controls.target.quaternion);
 
-    backRaycaster.set(characterPosition, backRayDirection);
-    const backIntersections = backRaycaster.intersectObject(this.model);
+      frontRaycaster.set(characterPosition, frontRayDirection);
+      const frontIntersections = frontRaycaster.intersectObject(this.model);
 
-    // 이동 가능한 최소 및 최대 거리 설정
-    const minFrontDistance = 0.1; // 캐릭터와 맵 사이 최소 거리
-    const maxBackDistance = 0.5; // 뒤로 이동 가능한 최대 거리
+      backRaycaster.set(characterPosition, backRayDirection);
+      const backIntersections = backRaycaster.intersectObject(this.model);
 
-    if (frontIntersections.length > 0) {
-      // 앞쪽에 장애물이 있을 경우
-      const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
+      const minFrontDistance = 0.5;
+      const maxBackDistance = 0.5; 
 
-      if (frontDistance <= minFrontDistance) {
-        // 앞으로 이동을 제한
-        // 캐릭터의 이동 로직 추가
+      const oldPosition = new THREE.Vector3();
+      oldPosition.copy(this._controls.target.position);
+
+      if (frontIntersections.length > 0) {
+        // 앞쪽에 장애물이 있을 경우
+        const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
+        console.log("앞에 거리:"+frontDistance);
+        let oldPosition;
+        if (frontDistance <= minFrontDistance) {
+          // 앞으로 이동을 제한
+          this.check = 1;
+        }
       }
+
+      // if (backIntersections.length > 0) {
+      //   // 뒤쪽에 장애물이 있을 경우
+      //   const backDistance = characterPosition.distanceTo(backIntersections[0].point);
+      //   console.log("뒤에 거리:"+backDistance);
+      //   if (backDistance <= maxBackDistance) {
+      //     // 뒤로 이동을 제한
+      //     this.check = 1;
+      //   }
+      // }
     }
 
-    if (backIntersections.length > 0) {
-      // 뒤쪽에 장애물이 있을 경우
-      const backDistance = characterPosition.distanceTo(backIntersections[0].point);
-
-      if (backDistance >= maxBackDistance) {
-        // 뒤로 이동을 제한
-        // 캐릭터의 이동 로직 추가
-      }
+    if (this._controls) {
+      this._controls.Update(timeElapsedS, this.check);
     }
-    }
-
     
 
   }
@@ -622,9 +593,3 @@ let _APP = null;
 window.addEventListener('DOMContentLoaded', () => {
   _APP = new AnimalCrossing();
 });
-
-// 오르막 좌표 x= 41, y = 1, z = -28.3
-// 방향 -3.14 , 0 , -3.14
-
-// 도착지 x = 41, y = 3, z = -45
-// 방향 -3.14 , 1.361 , -3.14

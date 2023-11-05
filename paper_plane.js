@@ -160,6 +160,9 @@ window.onload = function init() {
 				clearInterval(interval2);
 			}
 		}, 23);
+
+		// 마우스 이벤트 리스너 제거
+		window.removeEventListener('mousemove', handleMouseMove);
 	}
 
 

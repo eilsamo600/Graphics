@@ -7,7 +7,7 @@ window.onload = function init() {
 
 	const renderer = new THREE.WebGLRenderer({ canvas });
 	renderer.setSize(canvas.width, canvas.height);
-
+	renderer.setClearColor(0x000000, 0); // 투명 배경
 	const scene = new THREE.Scene();
 	scene.background = new THREE.CanvasTexture(generateGradientCanvas());
 
@@ -182,5 +182,19 @@ window.onload = function init() {
 
 
 	}
+	function handleResize() {
+		const canvas = document.getElementById("gl-canvas");
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	  
+		camera.aspect = canvas.width / canvas.height;
+		camera.updateProjectionMatrix();
+	  
+		renderer.setSize(canvas.width, canvas.height);
+		scene.background = new THREE.CanvasTexture(generateGradientCanvas());
+
+	  }
+	  
+	window.addEventListener('resize', handleResize);
 	window.addEventListener('mousemove', handleMouseMove);
 }

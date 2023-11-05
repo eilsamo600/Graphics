@@ -49,7 +49,7 @@ class BasicCharacterController {
     this._stateMachine = new CharacterFSM(
       this._animations);
 
-    
+
   }
 
 
@@ -93,7 +93,7 @@ class BasicCharacterController {
       Math.abs(frameDecceleration.z), Math.abs(velocity.z));
 
     velocity.add(frameDecceleration);
-    
+
     const controlObject = this.target;
     const _Q = new THREE.Quaternion();
     const _A = new THREE.Vector3();
@@ -272,17 +272,17 @@ class WalkState extends State {
     const previousAnimationAction = prevAction;
     this._currentAnimationAction = curAction;
 
-    if(previousAnimationAction !== this._currentAnimationAction) {
-        previousAnimationAction.fadeOut(0.5);
-        this._currentAnimationAction.reset().fadeIn(0.5).play();
+    if (previousAnimationAction !== this._currentAnimationAction) {
+      previousAnimationAction.fadeOut(0.5);
+      this._currentAnimationAction.reset().fadeIn(0.5).play();
     }
   }
   Enter(prevState, animations) {
     const curAction = animations["walk01"];
-    if(prevState){
+    if (prevState) {
       const prevAction = animations["walk"];
       this.changeAnimation(curAction, prevAction)
-    }else{
+    } else {
       curAction.play();
     }
 
@@ -315,18 +315,18 @@ class IdleState extends State {
     const previousAnimationAction = prevAction;
     this._currentAnimationAction = idleAction;
 
-    if(previousAnimationAction !== this._currentAnimationAction) {
-        previousAnimationAction.fadeOut(0.5);
-        this._currentAnimationAction.reset().fadeIn(0.5).play();
+    if (previousAnimationAction !== this._currentAnimationAction) {
+      previousAnimationAction.fadeOut(0.5);
+      this._currentAnimationAction.reset().fadeIn(0.5).play();
     }
-}
+  }
 
   Enter(prevState, animations) {
     // I made idle action name as walk and real walk aniation name "walk01"
     const idleAction = animations["walk"]; 
     if (prevState) {
       const prevAction = animations["walk01"];
-      this.changeAnimation(idleAction,prevAction);
+      this.changeAnimation(idleAction, prevAction);
     } else {
       idleAction.play();
     }
@@ -344,35 +344,35 @@ class IdleState extends State {
 };
 
 class ThirdPersonCamera {
-  constructor(params ){
-    this._params = params; 
+  constructor(params) {
+    this._params = params;
     this._camera = params.camera;
 
     this._currentPosition = new THREE.Vector3();
     this._currentLookat = new THREE.Vector3();
   }
 
-  _CaculateIdealOffset(target){
+  _CaculateIdealOffset(target) {
     const idealOffset = new THREE.Vector3(0, 10, -25);
     idealOffset.applyQuaternion(target.quaternion);
     idealOffset.add(target.position);
     return idealOffset;
   }
 
-  _CaculateIdealLookat(target){
-    const idealLookat = new THREE.Vector3(0,0,15);
+  _CaculateIdealLookat(target) {
+    const idealLookat = new THREE.Vector3(0, 0, 15);
     idealLookat.applyQuaternion(target.quaternion);
     idealLookat.add(target.position);
     return idealLookat;
   }
 
-  Update(timeElapsed, target){
+  Update(timeElapsed, target) {
     const idealOffset = this._CaculateIdealOffset(target);
-    const idealLookat = this._CaculateIdealLookat(target); 
+    const idealLookat = this._CaculateIdealLookat(target);
 
     this._currentPosition.copy(idealOffset);
     this._currentLookat.copy(idealLookat);
-    
+
     this._camera.position.copy(this._currentPosition);
     this._camera.lookAt(this._currentLookat);
   }
@@ -477,13 +477,14 @@ class AnimalCrossing {
     this._scene.add(sky);
 
     this._previousRAF = null;
-    
+
     this._loadMap();
     this._LoadAnimatedModel();
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
     this._RAF();
+
   }
 
   
@@ -504,20 +505,21 @@ class AnimalCrossing {
       this._threejs.render(this._scene, this._camera);
       this._Step(t - this._previousRAF);
       this._previousRAF = t;
+
     });
   }
 
   _loadMap() {
     const loader = new GLTFLoader();
-    
+
     loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
-      const model = gltf.scene;
+      this.model = gltf.scene;
 
-      model.position.set(-50, 0, 50);
-      model.scale.set(100, 100, 100);
-      model.rotation.set(0, 0, 0);
+      this.model.position.set(-50, 0, 50);
+      this.model.scale.set(100, 100, 100);
+      this.model.rotation.set(0, 0, 0);
 
-      this._scene.add(model);
+      this._scene.add(this.model);
     });
   }
 
@@ -527,7 +529,7 @@ class AnimalCrossing {
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
-    
+
   }
 
   _Step(timeElapsed) {
@@ -540,10 +542,79 @@ class AnimalCrossing {
       this._controls.Update(timeElapsedS);
     }
 
-    if(this._controls.target != null){
+    if (this._controls.target != null) {
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
+      const raycaster = new THREE.Raycaster();
+      const characterPosition = this._controls.target.position;
+      raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0)); // Cast a ray downward
+
+      // Check for intersections with the map mesh
+      const intersections = raycaster.intersectObject(this.model);
+
+      console.log(intersections);
+
+      if (intersections.length > 0) {
+        const collisionPoint = intersections[0].point;
+        const distanceToGround = characterPosition.distanceTo(collisionPoint);
+
+        // Clamping distanceToGround between 1 and 2
+        const minDistance = 1;
+        const maxDistance = 1;
+        const clampedDistance = THREE.MathUtils.clamp(distanceToGround, minDistance, maxDistance);
+
+        // Adjust the character's height to stay within the range
+        const targetHeight = characterPosition.y + (clampedDistance - distanceToGround);
+        this._controls.target.position.y = targetHeight;
+
+        console.log('Clamped Distance to ground:', clampedDistance);
+      } else {
+        // No intersections, move the character up by 0.1 units
+        this._controls.target.position.y += 0.1;
+      }
+
+    const frontRaycaster = new THREE.Raycaster();
+    const backRaycaster = new THREE.Raycaster();
+
+    // 레이 방향 설정
+    const frontRayDirection = new THREE.Vector3(0, 0, 1); // 캐릭터의 앞쪽 방향
+    const backRayDirection = new THREE.Vector3(0, 0, -1); // 캐릭터의 뒤쪽 방향
+
+    // Raycaster를 설정하고 교차점을 얻습니다.
+    frontRaycaster.set(characterPosition, frontRayDirection);
+    const frontIntersections = frontRaycaster.intersectObject(this.model);
+
+    backRaycaster.set(characterPosition, backRayDirection);
+    const backIntersections = backRaycaster.intersectObject(this.model);
+
+    // 이동 가능한 최소 및 최대 거리 설정
+    const minFrontDistance = 0.1; // 캐릭터와 맵 사이 최소 거리
+    const maxBackDistance = 0.5; // 뒤로 이동 가능한 최대 거리
+
+    if (frontIntersections.length > 0) {
+      // 앞쪽에 장애물이 있을 경우
+      const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
+
+      if (frontDistance <= minFrontDistance) {
+        // 앞으로 이동을 제한
+        // 캐릭터의 이동 로직 추가
+      }
     }
+
+    if (backIntersections.length > 0) {
+      // 뒤쪽에 장애물이 있을 경우
+      const backDistance = characterPosition.distanceTo(backIntersections[0].point);
+
+      if (backDistance >= maxBackDistance) {
+        // 뒤로 이동을 제한
+        // 캐릭터의 이동 로직 추가
+      }
+    }
+    }
+
+    
+
   }
+
 }
 
 let _APP = null;

@@ -1,5 +1,4 @@
 
-let hidingText = false;
 window.onload = function init() {
 
 	const canvas = document.getElementById("gl-canvas");
@@ -126,18 +125,6 @@ window.onload = function init() {
 			// 마우스 이벤트 리스너 제거
 			window.removeEventListener('mousemove', handleMouseMove);
 
-			const canvas = document.createElement("canvas");
-			canvas.width = 256;
-			canvas.height = 256;
-
-			const context = canvas.getContext("2d");
-			if (!hidingText) {
-				// Set a transparent color to hide the text
-				context.fillStyle = "rgba(255, 255, 255, 255)";
-				context.fillRect(0, 0, canvas.width, canvas.height);
-				hidingText = true;
-				console.log(hidingText);
-			}
 
 			const interval1StartTime = Date.now();
 
@@ -157,44 +144,43 @@ window.onload = function init() {
 					}, interval1Duration);
 				}
 			}, 23);
+
 		}
+
+
+		function startSecondInterval() {
+			plane.rotation.y = Math.PI / 1.7;
+			plane.rotation.z = Math.PI / -2.5;
+			plane.position.x = -27
+			plane.position.y -= 3;
+			plane.position.z += 15;
+			camera.position.y = 12;
+			camera.position.z = 13;
+
+			const interval2 = setInterval(() => {
+
+				if (isSoundPlaying == true & plane.position.x == -25.5) {
+					sound.play();
+					isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
+				}
+
+				plane.position.x += planeSpeed * 0.3;
+				plane.position.y += planeSpeed * 0.02;
+				plane.position.z -= planeSpeed * 0.2;
+
+				//console.log(plane.position.x);
+
+				if (plane.position.x >= 120) {
+					clearInterval(interval2);
+				}
+			}, 23);
+
+		}
+
+
+		// 마우스 이벤트를 감지하고 위의 함수를 호출
+
+
 	}
-
-
-	function startSecondInterval() {
-		plane.rotation.y = Math.PI / 1.7;
-		plane.rotation.z = Math.PI / -2.5;
-		plane.position.x = -27
-		plane.position.y -= 3;
-		plane.position.z += 15;
-		camera.position.y = 12;
-		camera.position.z = 13;
-
-		const interval2 = setInterval(() => {
-
-			if (isSoundPlaying == true & plane.position.x == -25.5) {
-				sound.play();
-				isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
-			}
-
-			plane.position.x += planeSpeed * 0.3;
-			plane.position.y += planeSpeed * 0.02;
-			plane.position.z -= planeSpeed * 0.2;
-
-			console.log(plane.position.x);
-
-			if (plane.position.x >= 120) {
-				clearInterval(interval2);
-			}
-		}, 23);
-
-	}
-
-
-	// 마우스 이벤트를 감지하고 위의 함수를 호출
 	window.addEventListener('mousemove', handleMouseMove);
-
-
 }
-
-

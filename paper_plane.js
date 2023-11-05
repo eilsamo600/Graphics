@@ -32,7 +32,28 @@ window.onload = function init() {
 
 	controls.enableRotate = false; //마우스로 움직이는거 안함
 	controls.enableZoom = false; //마우스로 확대축소 안함
+<<<<<<< Updated upstream
 	let plane
+=======
+
+	// create an AudioListener and add it to the camera
+	const listener = new THREE.AudioListener();
+	camera.add(listener);
+
+	// create the PositionalAudio object (passing in the listener)
+	const sound = new THREE.Audio(listener);
+
+	// load a sound and set it as the PositionalAudio object's buffer
+	const audioLoader = new THREE.AudioLoader();
+	audioLoader.load('sounds/Swoosh.ogg', function (buffer) {
+		sound.setBuffer(buffer);
+		//sound.setRefDistance(20);
+		//sound.setLoop(true);
+		sound.setVolume(0.2); // Corrected typo here
+		//sound.play();
+	});
+
+>>>>>>> Stashed changes
 	const loader = new THREE.GLTFLoader();
 	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
@@ -41,7 +62,7 @@ window.onload = function init() {
 		plane.rotation.y = Math.PI / -2.0;
 		plane.rotation.z = Math.PI / 2.5;
 
-		scene.add(gltf.scene);
+		scene.add(plane);
 
 		animate();
 	}, undefined, function (error) {
@@ -82,9 +103,14 @@ window.onload = function init() {
 	}
 
 	const planeSpeed = 5.0;
+	let isSoundPlaying = true;
 
 	function handleMouseMove(event) {
 		event.preventDefault();
+		if (event.buttons == 1 && plane) {
+			sound.play();
+			isSoundPlaying = false;
+		}
 
 		// 마우스로 클릭한 상태인 경우 비행기의 위치를 변경
 		if (event.buttons == 1 && plane) {
@@ -99,17 +125,17 @@ window.onload = function init() {
 
 				//console.log(plane.position.y);
 
-				// 화면 밖으로 나가는 조건을 설정할 수 있음
-				// if (plane.position.x < minX) { plane.position.x = minX; }
-
 				// plane.position.x가 원하는 위치에 도달하면 interval을 종료
 				if (plane.position.x <= -37) {
 					clearInterval(interval1);
-					const interval1EndTime = Date.now() + 800;
+					const interval1EndTime = Date.now() + 1000;
 					const interval1Duration = interval1EndTime - interval1StartTime;
-					setTimeout(startSecondInterval, interval1Duration);
+					setTimeout(() => {
+						startSecondInterval();
+						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
+					}, interval1Duration);
 				}
-			}, 23); // 0.2초(200ms) 간격으로 이동
+			}, 23);
 		}
 	}
 
@@ -122,16 +148,23 @@ window.onload = function init() {
 		plane.position.z += 15;
 		camera.position.y = 12;
 		camera.position.z = 13;
+
 		const interval2 = setInterval(() => {
 
 			plane.position.x += planeSpeed * 0.3;
 			plane.position.y += planeSpeed * 0.02;
 			plane.position.z -= planeSpeed * 0.2;
 
+			sound.play();
+
 			//console.log(plane.position.x);
 
+<<<<<<< Updated upstream
 			// plane.position.x가 원하는 위치에 도달하면 interval을 종료
 			if (plane.position.x >= 120) {
+=======
+			if (plane.position.x >= 80) {
+>>>>>>> Stashed changes
 				clearInterval(interval2);
 			}
 		}, 23);

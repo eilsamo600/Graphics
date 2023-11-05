@@ -73,13 +73,21 @@ window.onload = function init() {
 		renderer.render(scene, camera);
 	}
 
-	// 그라데이션 텍스처를 생성하는 함수
 	function generateGradientCanvas() {
+
+		const dpi = window.devicePixelRatio || 1; // 현재 장치의 DPI를 가져옵니다.
+		const screenWidth = window.innerWidth;
+		const screenHeight = window.innerHeight;
+
 		const canvas = document.createElement("canvas");
-		canvas.width = 256;
-		canvas.height = 256;
+		canvas.width = screenWidth * dpi;
+		canvas.height = screenHeight * dpi;
 
 		const context = canvas.getContext("2d");
+		context.scale(dpi, dpi); // 캔버스의 크기를 DPI에 맞게 확대합니다.
+
+		const text = "Click the screen to start";
+		const fontSize = canvas.width / (text.length * 1.8); // 텍스트 크기를 DPI에 맞게 설정합니다.
 
 		const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
 		gradient.addColorStop(0, '#e3f2ff');
@@ -88,15 +96,18 @@ window.onload = function init() {
 
 		context.fillStyle = gradient;
 		context.fillRect(0, 0, canvas.width, canvas.height);
-		context.font = "16px Arial";
+
+		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
-		const text = "Click the screen to start";
+
 		const textWidth = context.measureText(text).width;
-		const textX = (canvas.width - textWidth) / 2;
-		const textY = canvas.height / 4;
+		const textX = canvas.width / 7.5;
+		const textY = canvas.height / 8;
 		context.fillText(text, textX, textY);
+
 		return canvas;
 	}
+
 
 	const planeSpeed = 5.0;
 	let isSoundPlaying = true;

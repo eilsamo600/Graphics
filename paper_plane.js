@@ -158,11 +158,16 @@ window.onload = function init() {
 
 		const interval2 = setInterval(() => {
 
+			if (plane.position.x == -27) {
+
+				sound.play();
+				isSoundPlaying = false;
+			}
+
 			plane.position.x += planeSpeed * 0.3;
 			plane.position.y += planeSpeed * 0.02;
 			plane.position.z -= planeSpeed * 0.2;
 
-			sound.play();
 
 			//console.log(plane.position.x);
 

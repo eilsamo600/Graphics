@@ -1,4 +1,5 @@
 
+let hidingText = false;
 window.onload = function init() {
 
 	const canvas = document.getElementById("gl-canvas");
@@ -119,15 +120,23 @@ window.onload = function init() {
 			isSoundPlaying = false;
 		}
 
-		// 마우스로 클릭한 상태인 경우 비행기의 위치를 변경
 		if (event.buttons == 1 && plane) {
 			const canvas = document.createElement("canvas");
+			canvas.width = 256;
+			canvas.height = 256;
+
 			const context = canvas.getContext("2d");
-			context.clearRect(0, 0, canvas.width, canvas.height);
+			if (!hidingText) {
+				// Set a transparent color to hide the text
+				context.fillStyle = "rgba(255, 255, 255, 255)";
+				context.fillRect(0, 0, canvas.width, canvas.height);
+				hidingText = true;
+				console.log(hidingText);
+			}
+
 			const interval1StartTime = Date.now();
 
 			const interval1 = setInterval(() => {
-				// 비행기를 왼쪽으로 빠르게 이동시킴
 				plane.position.x -= planeSpeed * 0.3;
 
 				//console.log(plane.position.y);

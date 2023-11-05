@@ -1,7 +1,10 @@
+let canvas; // 캔버스 엘리먼트를 변수로 선언합니다.
+let context; // 캔버스 컨텍스트를 변수로 선언합니다.
 
 window.onload = function init() {
 
 	const canvas = document.getElementById("gl-canvas");
+
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
@@ -29,7 +32,7 @@ window.onload = function init() {
 
 	controls.enableRotate = false; //마우스로 움직이는거 안함
 	controls.enableZoom = false; //마우스로 확대축소 안함
-
+	let plane
 	const loader = new THREE.GLTFLoader();
 	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
@@ -68,7 +71,13 @@ window.onload = function init() {
 
 		context.fillStyle = gradient;
 		context.fillRect(0, 0, canvas.width, canvas.height);
-
+		context.font = "16px Arial";
+		context.fillStyle = "rgb(255, 255, 255)";
+		const text = "Click the screen to start";
+		const textWidth = context.measureText(text).width;
+		const textX = (canvas.width - textWidth) / 2;
+		const textY = canvas.height / 4;
+		context.fillText(text, textX, textY);
 		return canvas;
 	}
 
@@ -79,6 +88,9 @@ window.onload = function init() {
 
 		// 마우스로 클릭한 상태인 경우 비행기의 위치를 변경
 		if (event.buttons == 1 && plane) {
+			const canvas = document.createElement("canvas");
+			const context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
 			const interval1StartTime = Date.now();
 
 			const interval1 = setInterval(() => {
@@ -91,7 +103,7 @@ window.onload = function init() {
 				// if (plane.position.x < minX) { plane.position.x = minX; }
 
 				// plane.position.x가 원하는 위치에 도달하면 interval을 종료
-				if (plane.position.x <= -27) {
+				if (plane.position.x <= -37) {
 					clearInterval(interval1);
 					const interval1EndTime = Date.now() + 800;
 					const interval1Duration = interval1EndTime - interval1StartTime;
@@ -101,9 +113,11 @@ window.onload = function init() {
 		}
 	}
 
+
 	function startSecondInterval() {
 		plane.rotation.y = Math.PI / 1.7;
 		plane.rotation.z = Math.PI / -2.5;
+		plane.position.x = -27
 		plane.position.y -= 3;
 		plane.position.z += 15;
 		camera.position.y = 12;
@@ -117,7 +131,7 @@ window.onload = function init() {
 			//console.log(plane.position.x);
 
 			// plane.position.x가 원하는 위치에 도달하면 interval을 종료
-			if (plane.position.x >= 80) {
+			if (plane.position.x >= 120) {
 				clearInterval(interval2);
 			}
 		}, 23);
@@ -129,5 +143,4 @@ window.onload = function init() {
 
 
 }
-
 

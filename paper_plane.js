@@ -1,5 +1,4 @@
 
-let hidingText = false;
 window.onload = function init() {
 
 	const canvas = document.getElementById("gl-canvas");
@@ -100,7 +99,7 @@ window.onload = function init() {
 
 		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
-
+		canvas.id = "startText";
 		const textWidth = context.measureText(text).width;
 		const textX = canvas.width / 7.5;
 		const textY = canvas.height / 8;
@@ -121,19 +120,10 @@ window.onload = function init() {
 		}
 
 		if (event.buttons == 1 && plane) {
-			const canvas = document.createElement("canvas");
-			canvas.width = 256;
-			canvas.height = 256;
-
-			const context = canvas.getContext("2d");
-			if (!hidingText) {
-				// Set a transparent color to hide the text
-				context.fillStyle = "rgba(255, 255, 255, 255)";
-				context.fillRect(0, 0, canvas.width, canvas.height);
-				hidingText = true;
-				console.log(hidingText);
+			const startText = document.getElementById("startText");
+			if (startText) {
+				startText.style.display = "none";
 			}
-
 			const interval1StartTime = Date.now();
 
 			const interval1 = setInterval(() => {

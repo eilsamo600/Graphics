@@ -31,7 +31,7 @@ window.onload = function init() {
 	controls.enableZoom = false; //마우스로 확대축소 안함
 
 	const loader = new THREE.GLTFLoader();
-	loader.load('./paper_plane/scene.gltf', function (gltf) {
+	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
 
 		plane.rotation.x = 1.1;

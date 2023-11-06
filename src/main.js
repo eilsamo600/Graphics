@@ -425,6 +425,21 @@ class AnimalCrossing {
     hemiLight.groundColor.setHSL(0.095, 1, 0.75);
     this._scene.add(hemiLight);
 
+    const listener = new THREE.AudioListener();
+    this._scene.add(listener);
+
+    const sound = new THREE.Audio(listener);
+
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load('./sounds/animal_crossing.ogg', (buffer) => {
+      //const sound = new THREE.Audio(this._controls.listener);
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(0.2);
+      sound.play();
+    });
+
+
     const uniforms = {
       "topColor": { value: new THREE.Color(0x0077ff) },
       "bottomColor": { value: new THREE.Color(0xffffff) },

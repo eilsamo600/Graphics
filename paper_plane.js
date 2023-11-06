@@ -142,13 +142,13 @@ window.onload = function init() {
 				}
 			}, 23);
 
-			// if (plane) {
+			if (plane) {
 
-			// 	// 5초 후에 페이지 이동
-			// 	setTimeout(function () {
-			// 		window.location.href = "./index.html"; // 새로운 페이지로 이동
-			// 	}, 5000); // 5000 밀리초 (5초) 지연
-			// }
+				// 5초 후에 페이지 이동
+				setTimeout(function () {
+					window.location.href = "./index.html"; // 새로운 페이지로 이동
+				}, 5000); // 5000 밀리초 (5초) 지연
+			}
 
 		}
 

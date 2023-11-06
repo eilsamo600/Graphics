@@ -98,10 +98,11 @@ window.onload = function init() {
 
 		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
+		context.textAlign = "center";
 
 		const textWidth = context.measureText(text).width;
-		const textX = canvas.width / 7.5;
-		const textY = canvas.height / 8;
+		var textX = canvas.width / 4; // Calculate the center of the canvas for textX.
+		var textY = canvas.height / 8;
 		context.fillText(text, textX, textY);
 
 		return canvas;

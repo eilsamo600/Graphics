@@ -102,7 +102,7 @@ class BasicCharacterController {
 
     if (this._input._keys.forward) {
       velocity.z += acc.z * timeInSeconds;
-      if(check){
+      if (check) {
         velocity.z = 0;
       }
     }
@@ -137,12 +137,12 @@ class BasicCharacterController {
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
     console.log(check);
-    if(check == 1){
+    if (check == 1) {
       return;
-    }else{
-      controlObject.position.add(forward); 
+    } else {
+      controlObject.position.add(forward);
     }
-    
+
     controlObject.position.add(sideways);
 
     oldPosition.copy(controlObject.position);
@@ -481,11 +481,11 @@ class AnimalCrossing {
   _loadMap() {
     const loader = new GLTFLoader();
 
-    loader.load('resources/animal_crossing_map/scene.gltf', (gltf) => {
-      this.model = gltf.scene;
+    loader.load('resources/map/ACmap.glb', (glb) => {
+      this.model = glb.scene;
 
       this.model.position.set(-50, 0, 50);
-      this.model.scale.set(100, 100, 100);
+      this.model.scale.set(15, 15, 15);
       this.model.rotation.set(0, 0, 0);
 
       this._scene.add(this.model);
@@ -552,7 +552,7 @@ class AnimalCrossing {
       const backIntersections = backRaycaster.intersectObject(this.model);
 
       const minFrontDistance = 0.5;
-      const maxBackDistance = 0.5; 
+      const maxBackDistance = 0.5;
 
       const oldPosition = new THREE.Vector3();
       oldPosition.copy(this._controls.target.position);
@@ -560,7 +560,7 @@ class AnimalCrossing {
       if (frontIntersections.length > 0) {
         // 앞쪽에 장애물이 있을 경우
         const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
-        console.log("앞에 거리:"+frontDistance);
+        console.log("앞에 거리:" + frontDistance);
         let oldPosition;
         if (frontDistance <= minFrontDistance) {
           // 앞으로 이동을 제한
@@ -582,7 +582,7 @@ class AnimalCrossing {
     if (this._controls) {
       this._controls.Update(timeElapsedS, this.check);
     }
-    
+
 
   }
 

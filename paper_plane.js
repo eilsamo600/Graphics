@@ -4,7 +4,7 @@ window.onload = function init() {
 	const canvas = document.getElementById("gl-canvas");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-
+	let hasMouseClickExecuted = false;
 	const renderer = new THREE.WebGLRenderer({ canvas });
 	renderer.setSize(canvas.width, canvas.height);
 	renderer.setClearColor(0x000000, 0); // 투명 배경
@@ -111,18 +111,15 @@ window.onload = function init() {
 	const planeSpeed = 5.0;
 	let isSoundPlaying = true;
 
-	function handleMouseMove(event) {
-		event.preventDefault();
+	function handleMouseClick(event) {
 
 
-		if (event.buttons == 1 && plane) {
-
+		if (!hasMouseClickExecuted && plane) {
+			hasMouseClickExecuted = true;
 			sound.play();
 			isSoundPlaying = false;
-
 			// 마우스 이벤트 리스너 제거
-			window.removeEventListener('mousemove', handleMouseMove);
-
+			window.removeEventListener('click', handleMouseClick);
 
 			const interval1StartTime = Date.now();
 
@@ -143,12 +140,11 @@ window.onload = function init() {
 				}
 			}, 23);
 
-			if (event.buttons == 1 && plane) {
-				// ...
-			
+			if (plane) {
+
 				// 5초 후에 페이지 이동
-				setTimeout(function() {
-				  window.location.href = "./index.html"; // 새로운 페이지로 이동
+				setTimeout(function () {
+					window.location.href = "./index.html"; // 새로운 페이지로 이동
 				}, 5000); // 5000 밀리초 (5초) 지연
 			}
 
@@ -193,17 +189,24 @@ window.onload = function init() {
 		const canvas = document.getElementById("gl-canvas");
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
-	  
+
 		camera.aspect = canvas.width / canvas.height;
 		camera.updateProjectionMatrix();
-	  
+
 		renderer.setSize(canvas.width, canvas.height);
 		scene.background = new THREE.CanvasTexture(generateGradientCanvas());
 
-	  }
-	  
+	}
+
 	window.addEventListener('resize', handleResize);
-	window.addEventListener('mousemove', handleMouseMove);
+
+	window.addEventListener('click', () => {
+
+		// Call your function when the mouse is released
+		console.log('click');
+		handleMouseClick();
+
+	});
 }
 
 

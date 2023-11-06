@@ -7,7 +7,7 @@ window.onload = function init() {
 
 	const renderer = new THREE.WebGLRenderer({ canvas });
 	renderer.setSize(canvas.width, canvas.height);
-
+	renderer.setClearColor(0x000000, 0); // 투명 배경
 	const scene = new THREE.Scene();
 	scene.background = new THREE.CanvasTexture(generateGradientCanvas());
 
@@ -115,7 +115,6 @@ window.onload = function init() {
 		event.preventDefault();
 
 
-
 		if (event.buttons == 1 && plane) {
 
 			sound.play();
@@ -143,6 +142,15 @@ window.onload = function init() {
 					}, interval1Duration);
 				}
 			}, 23);
+
+			if (event.buttons == 1 && plane) {
+				// ...
+			
+				// 5초 후에 페이지 이동
+				setTimeout(function() {
+				  window.location.href = "./index.html"; // 새로운 페이지로 이동
+				}, 5000); // 5000 밀리초 (5초) 지연
+			}
 
 		}
 
@@ -181,5 +189,19 @@ window.onload = function init() {
 
 
 	}
+	function handleResize() {
+		const canvas = document.getElementById("gl-canvas");
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	  
+		camera.aspect = canvas.width / canvas.height;
+		camera.updateProjectionMatrix();
+	  
+		renderer.setSize(canvas.width, canvas.height);
+		scene.background = new THREE.CanvasTexture(generateGradientCanvas());
+
+	  }
+	  
+	window.addEventListener('resize', handleResize);
 	window.addEventListener('mousemove', handleMouseMove);
 }

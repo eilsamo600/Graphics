@@ -32,7 +32,6 @@ window.onload = function init() {
 
 	let plane
 
-
 	// create an AudioListener and add it to the camera
 	const listener = new THREE.AudioListener();
 	camera.add(listener);
@@ -206,3 +205,5 @@ window.onload = function init() {
 	window.addEventListener('resize', handleResize);
 	window.addEventListener('mousemove', handleMouseMove);
 }
+
+

@@ -32,7 +32,6 @@ window.onload = function init() {
 
 	let plane
 
-
 	// create an AudioListener and add it to the camera
 	const listener = new THREE.AudioListener();
 	camera.add(listener);
@@ -46,7 +45,7 @@ window.onload = function init() {
 		sound.setBuffer(buffer);
 		//sound.setRefDistance(20);
 		//sound.setLoop(true);
-		sound.setVolume(0.2); // Corrected typo here
+		sound.setVolume(0.2);
 		//sound.play();
 	});
 
@@ -139,8 +138,8 @@ window.onload = function init() {
 					const interval1EndTime = Date.now() + 1000;
 					const interval1Duration = interval1EndTime - interval1StartTime;
 					setTimeout(() => {
-						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
 						startSecondInterval();
+						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
 					}, interval1Duration);
 				}
 			}, 23);

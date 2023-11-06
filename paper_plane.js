@@ -9,7 +9,8 @@ window.onload = function init() {
 	renderer.setSize(canvas.width, canvas.height);
 	renderer.setClearColor(0x000000, 0); // 투명 배경
 	const scene = new THREE.Scene();
-	scene.background = new THREE.CanvasTexture(generateGradientCanvas());
+	this.check = 1;
+	scene.background = new THREE.CanvasTexture(generateGradientCanvas(this.check));
 
 
 	camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
@@ -72,7 +73,13 @@ window.onload = function init() {
 		renderer.render(scene, camera);
 	}
 
-	function generateGradientCanvas() {
+	function generateGradientCanvas(check) {
+		let text = "";
+		if(check){
+			text = "Click the scrren to start";
+		}else{
+			text = "";
+		}
 
 		const dpi = window.devicePixelRatio || 1; // 현재 장치의 DPI를 가져옵니다.
 		const screenWidth = window.innerWidth;
@@ -82,10 +89,10 @@ window.onload = function init() {
 		canvas.width = screenWidth * dpi;
 		canvas.height = screenHeight * dpi;
 
-		const context = canvas.getContext("2d");
-		context.scale(dpi, dpi); // 캔버스의 크기를 DPI에 맞게 확대합니다.
+		this.context = canvas.getContext("2d");
+		this.context.scale(dpi, dpi); // 캔버스의 크기를 DPI에 맞게 확대합니다.
 
-		const text = "Click the screen to start";
+		// const text = "";
 		const fontSize = canvas.width / (text.length * 1.8); // 텍스트 크기를 DPI에 맞게 설정합니다.
 
 		const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -93,16 +100,15 @@ window.onload = function init() {
 		gradient.addColorStop(0.5, '#ede3ff');
 		gradient.addColorStop(1, '#ffe3f9');
 
-		context.fillStyle = gradient;
-		context.fillRect(0, 0, canvas.width, canvas.height);
+		this.context.fillStyle = gradient;
+		this.context.fillRect(0, 0, canvas.width, canvas.height);
 
 		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
-		context.textAlign = "center";
 
 		const textWidth = context.measureText(text).width;
-		var textX = canvas.width / 4; // Calculate the center of the canvas for textX.
-		var textY = canvas.height / 8;
+		const textX = canvas.width / 7.5;
+		const textY = canvas.height / 8;
 		context.fillText(text, textX, textY);
 
 		return canvas;
@@ -196,15 +202,17 @@ window.onload = function init() {
 		camera.updateProjectionMatrix();
 
 		renderer.setSize(canvas.width, canvas.height);
-		scene.background = new THREE.CanvasTexture(generateGradientCanvas());
+		scene.background = new THREE.CanvasTexture(generateGradientCanvas(check));
 
 	}
 
 	window.addEventListener('resize', handleResize);
 
 	window.addEventListener('click', () => {
-
+		this.check = 0;
 		// Call your function when the mouse is released
+		scene.background = new THREE.CanvasTexture(generateGradientCanvas(check));
+
 		console.log('click');
 		handleMouseClick();
 

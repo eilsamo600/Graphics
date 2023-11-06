@@ -37,7 +37,7 @@ window.onload = function init() {
 	const loader = new THREE.GLTFLoader();
 	loader.load('resources/tiny_cabin/scene.gltf', function (gltf) {
 		cabin = gltf.scene;
-        cabin.scale.set(6, 6, 6);
+        cabin.scale.set(7, 7, 7);
         cabin.position.setY(-5);
 		cabin.rotation.x = -0.5;
 
@@ -51,13 +51,13 @@ window.onload = function init() {
     	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
 
-		plane.rotation.x = -37;
-		plane.rotation.y = Math.PI / -2.0;
+		plane.rotation.x = -36;
+		plane.rotation.y = Math.PI / -2.6;
 		plane.rotation.z = Math.PI / 3.5;
 
 
-		plane.position.x = 27
-		plane.position.y = 3;
+		plane.position.x = 30
+		plane.position.y = 10;
 		plane.position.z = 15;
 		camera.position.y = 12;
 		camera.position.z = 13;
@@ -66,9 +66,27 @@ window.onload = function init() {
 		scene.add(plane);
 
 		animate();
+        const interval = setInterval(() => {
+
+
+            plane.position.x -= planeSpeed * 0.1;
+            plane.position.y -= planeSpeed * 0.2;
+            plane.position.z -= planeSpeed * 0.2;
+
+            //console.log(plane.position.x);
+
+            if (plane.position.x <= 0) {
+                clearInterval(interval);
+                scene.remove(plane);
+            }
+        }, 28);
+        
+
 	}, undefined, function (error) {
 		console.error(error);
 	});
+
+
 
 	function animate() {
 		controls.update();
@@ -104,29 +122,17 @@ window.onload = function init() {
 		return canvas;
 	}
 
-	const planeSpeed = 3.0;
+	const planeSpeed = 5.0;
 
 	function handleMouseMove(event) {
-		event.preventDefault();
+		//event.preventDefault();
 
 
-		if (event.buttons == 1 && cabin) {
+		if (cabin) {
 
-			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('click', handleMouseMove);
 
-            const interval = setInterval(() => {
-
-
-				plane.position.x -= planeSpeed * 0.3;
-				plane.position.y -= planeSpeed * 0.02;
-				plane.position.z -= planeSpeed * 0.2;
-
-				//console.log(plane.position.x);
-
-				if (plane.position.x <= 0) {
-					clearInterval(interval);
-				}
-			}, 23);
+            
 
             setTimeout(function() {
                 window.location.href = "./index.html"; // 새로운 페이지로 이동
@@ -150,7 +156,7 @@ window.onload = function init() {
 	  }
 	  
 	window.addEventListener('resize', handleResize);
-	window.addEventListener('mousemove', handleMouseMove);
+	window.addEventListener('click', handleMouseMove);
 }
 
 

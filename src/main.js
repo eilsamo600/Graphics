@@ -403,6 +403,7 @@ class AnimalCrossing {
     this._threejs.domElement.id = 'threejs';
 
     document.getElementById('container').appendChild(this._threejs.domElement);
+    document.addEventListener('keydown', (e) => this._OnKeyDown(e), false);
 
     window.addEventListener('resize', () => {
       this._OnWindowResize();
@@ -461,6 +462,8 @@ class AnimalCrossing {
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
 
+    this._CreateOrbitControls(); // 새로운 메서드 호출
+
     this._previousRAF = null;
 
     this._loadMap();
@@ -468,6 +471,11 @@ class AnimalCrossing {
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
+
+
+    // 추가: R 키 눌렀을 때 카메라 전환 변수
+    this._isOrbitCamera = false;
+
     this._RAF();
 
   }
@@ -515,6 +523,34 @@ class AnimalCrossing {
     this._controls = new BasicCharacterController(params);
 
   }
+  _CreateOrbitControls() {
+    this._orbitControls = new OrbitControls(this._camera, this._threejs.domElement);
+    this._orbitControls.enableDamping = true;
+    this._orbitControls.dampingFactor = 0.05;
+    this._orbitControls.screenSpacePanning = false;
+    this._orbitControls.minDistance = 10;
+    this._orbitControls.maxDistance = 50;
+    this._orbitControls.maxPolarAngle = Math.PI / 2;
+    this._orbitControls.target.set(0, 10, 0);
+
+    // OrbitControls를 초기에 비활성화
+    this._orbitControls.enabled = false;
+  }
+
+  _ToggleCameraMode() {
+    this._isOrbitCamera = !this._isOrbitCamera;
+
+    if (this._isOrbitCamera) {
+      // Switch to OrbitControls and disable the third-person camera
+      this._orbitControls.enabled = true;
+      this.able = 1; // Add this method disable
+    } else {
+      // Switch back to third-person camera and disable OrbitControls
+      this._orbitControls.enabled = false;
+      this.able = 0;
+      // this._thirdPersonCamera.Enable(); // Add this method enable
+    }
+  }
 
   _Step(timeElapsed) {
     const timeElapsedS = timeElapsed * 0.001;
@@ -525,6 +561,7 @@ class AnimalCrossing {
 
     if (this._controls.target != null) {
       //update thirdPersonCamera
+      
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
 
       //ray for ground
@@ -592,6 +629,10 @@ class AnimalCrossing {
       //     this.check = 1;
       //   }
       // }
+
+      if (this._isOrbitCamera) {
+        this._orbitControls.update();
+      }
     }
 
     if (this._controls) {
@@ -599,6 +640,14 @@ class AnimalCrossing {
     }
 
 
+  }
+
+  _OnKeyDown(event) {
+    switch (event.keyCode) {
+      case 82: // R
+        this._ToggleCameraMode();
+        break;
+    }
   }
 
 }

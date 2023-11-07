@@ -136,7 +136,7 @@ class BasicCharacterController {
     sideways.multiplyScalar(velocity.x * timeInSeconds);
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
-    console.log(check);
+    // console.log(check);
     if (check == 1) {
       return;
     } else {
@@ -354,28 +354,43 @@ class ThirdPersonCamera {
   constructor(params) {
     this._params = params;
     this._camera = params.camera;
+    this._enabled = true; // Initially, the camera is enabled
 
     this._currentPosition = new THREE.Vector3();
     this._currentLookat = new THREE.Vector3();
   }
 
-  _CaculateIdealOffset(target) {
+  _CalculateIdealOffset(target) {
     const idealOffset = new THREE.Vector3(0, 10, -25);
     idealOffset.applyQuaternion(target.quaternion);
     idealOffset.add(target.position);
     return idealOffset;
   }
 
-  _CaculateIdealLookat(target) {
+  _CalculateIdealLookat(target) {
     const idealLookat = new THREE.Vector3(0, 0, 15);
     idealLookat.applyQuaternion(target.quaternion);
     idealLookat.add(target.position);
     return idealLookat;
   }
 
+  Enable() {
+    this._enabled = true;
+  }
+
+  Disable() {
+    this._enabled = false;
+  }
+
   Update(timeElapsed, target) {
-    const idealOffset = this._CaculateIdealOffset(target);
-    const idealLookat = this._CaculateIdealLookat(target);
+    // console.log(this._enabled);
+    if (!this._enabled) {
+      // Camera is disabled, do not update
+      return;
+    }
+
+    const idealOffset = this._CalculateIdealOffset(target);
+    const idealLookat = this._CalculateIdealLookat(target);
 
     this._currentPosition.copy(idealOffset);
     this._currentLookat.copy(idealLookat);
@@ -384,6 +399,7 @@ class ThirdPersonCamera {
     this._camera.lookAt(this._currentLookat);
   }
 }
+
 
 class AnimalCrossing {
   constructor() {
@@ -437,7 +453,7 @@ class AnimalCrossing {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);
-      sound.play();
+      // sound.play();
     });
 
 
@@ -462,7 +478,7 @@ class AnimalCrossing {
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
 
-    this._CreateOrbitControls(); // 새로운 메서드 호출
+    
 
     this._previousRAF = null;
 
@@ -471,6 +487,7 @@ class AnimalCrossing {
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
+    this._CreateOrbitControls();
 
 
     // 추가: R 키 눌렀을 때 카메라 전환 변수
@@ -531,25 +548,93 @@ class AnimalCrossing {
     this._orbitControls.minDistance = 10;
     this._orbitControls.maxDistance = 50;
     this._orbitControls.maxPolarAngle = Math.PI / 2;
-    this._orbitControls.target.set(0, 10, 0);
 
-    // OrbitControls를 초기에 비활성화
     this._orbitControls.enabled = false;
   }
 
   _ToggleCameraMode() {
     this._isOrbitCamera = !this._isOrbitCamera;
-
+  
     if (this._isOrbitCamera) {
-      // Switch to OrbitControls and disable the third-person camera
       this._orbitControls.enabled = true;
-      this.able = 1; // Add this method disable
+      this._thirdPersonCamera.Disable();
+      
+      this._orbitControls.target.copy(this._controls.target.position);
     } else {
-      // Switch back to third-person camera and disable OrbitControls
+
       this._orbitControls.enabled = false;
-      this.able = 0;
-      // this._thirdPersonCamera.Enable(); // Add this method enable
+      this._thirdPersonCamera.Enable();
     }
+  }
+
+  _RayForCollision(){
+
+    if(!this.model){
+      return;
+    }
+
+    //ray for ground
+    const raycaster = new THREE.Raycaster();
+    const characterPosition = this._controls.target.position;
+    raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0));
+
+    const intersections = raycaster.intersectObject(this.model);
+
+    if (intersections.length > 0) {
+      const collisionPoint = intersections[0].point;
+      const distanceToGround = characterPosition.distanceTo(collisionPoint);
+
+      const minDistance = 0.2;
+      const maxDistance = 0.5;
+      const clampedDistance = THREE.MathUtils.clamp(distanceToGround, minDistance, maxDistance);
+
+      const targetHeight = characterPosition.y + (clampedDistance - distanceToGround);
+      this._controls.target.position.y = targetHeight;
+
+    } else {
+      this._controls.target.position.y += 0.1;
+    }
+
+    const frontRaycaster = new THREE.Raycaster();
+    const backRaycaster = new THREE.Raycaster();
+
+    const frontRayDirection = new THREE.Vector3(0, 0, 1);
+    frontRayDirection.applyQuaternion(this._controls.target.quaternion);
+
+    const backRayDirection = new THREE.Vector3(0, 0, -1);
+    backRayDirection.applyQuaternion(this._controls.target.quaternion);
+
+    frontRaycaster.set(characterPosition, frontRayDirection);
+    const frontIntersections = frontRaycaster.intersectObject(this.model);
+
+    backRaycaster.set(characterPosition, backRayDirection);
+    const backIntersections = backRaycaster.intersectObject(this.model);
+
+    const minFrontDistance = 0.5;
+    const maxBackDistance = 0.5;
+
+    
+
+    if (frontIntersections.length > 0) {
+      // 앞쪽에 장애물이 있을 경우
+      const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
+      // console.log("앞에 거리:" + frontDistance);
+      let oldPosition;
+      if (frontDistance <= minFrontDistance) {
+        // 앞으로 이동을 제한
+        this.check = 1;
+      }
+    }
+
+    // if (backIntersections.length > 0) {
+    //   // 뒤쪽에 장애물이 있을 경우
+    //   const backDistance = characterPosition.distanceTo(backIntersections[0].point);
+    //   console.log("뒤에 거리:"+backDistance);
+    //   if (backDistance <= maxBackDistance) {
+    //     // 뒤로 이동을 제한
+    //     this.check = 1;
+    //   }
+    // }
   }
 
   _Step(timeElapsed) {
@@ -560,79 +645,11 @@ class AnimalCrossing {
     }
 
     if (this._controls.target != null) {
-      //update thirdPersonCamera
       
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
 
-      //ray for ground
-      const raycaster = new THREE.Raycaster();
-      const characterPosition = this._controls.target.position;
-      raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0));
+      this._RayForCollision();
 
-      const intersections = raycaster.intersectObject(this.model);
-
-      if (intersections.length > 0) {
-        const collisionPoint = intersections[0].point;
-        const distanceToGround = characterPosition.distanceTo(collisionPoint);
-
-        const minDistance = 1;
-        const maxDistance = 1;
-        const clampedDistance = THREE.MathUtils.clamp(distanceToGround, minDistance, maxDistance);
-
-        const targetHeight = characterPosition.y + (clampedDistance - distanceToGround);
-        this._controls.target.position.y = targetHeight;
-
-        // console.log('Clamped Distance to ground:', clampedDistance);
-      } else {
-        this._controls.target.position.y += 0.1;
-      }
-
-      //Ray for front and back
-      const frontRaycaster = new THREE.Raycaster();
-      const backRaycaster = new THREE.Raycaster();
-
-      const frontRayDirection = new THREE.Vector3(0, 0, 1);
-      frontRayDirection.applyQuaternion(this._controls.target.quaternion);
-
-      const backRayDirection = new THREE.Vector3(0, 0, -1);
-      backRayDirection.applyQuaternion(this._controls.target.quaternion);
-
-      frontRaycaster.set(characterPosition, frontRayDirection);
-      const frontIntersections = frontRaycaster.intersectObject(this.model);
-
-      backRaycaster.set(characterPosition, backRayDirection);
-      const backIntersections = backRaycaster.intersectObject(this.model);
-
-      const minFrontDistance = 0.5;
-      const maxBackDistance = 0.5;
-
-      const oldPosition = new THREE.Vector3();
-      oldPosition.copy(this._controls.target.position);
-
-      if (frontIntersections.length > 0) {
-        // 앞쪽에 장애물이 있을 경우
-        const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
-        console.log("앞에 거리:" + frontDistance);
-        let oldPosition;
-        if (frontDistance <= minFrontDistance) {
-          // 앞으로 이동을 제한
-          this.check = 1;
-        }
-      }
-
-      // if (backIntersections.length > 0) {
-      //   // 뒤쪽에 장애물이 있을 경우
-      //   const backDistance = characterPosition.distanceTo(backIntersections[0].point);
-      //   console.log("뒤에 거리:"+backDistance);
-      //   if (backDistance <= maxBackDistance) {
-      //     // 뒤로 이동을 제한
-      //     this.check = 1;
-      //   }
-      // }
-
-      if (this._isOrbitCamera) {
-        this._orbitControls.update();
-      }
     }
 
     if (this._controls) {

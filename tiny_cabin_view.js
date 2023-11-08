@@ -53,6 +53,7 @@ window.onload = function init() {
       console.error(error);
     }
   );
+  const planeSpeed = 4.0;
 
   loader.load(
     "resources/paper_plane/scene.gltf",
@@ -129,19 +130,69 @@ window.onload = function init() {
     return canvas;
   }
 
-  const planeSpeed = 5.0;
+  const zoomSpeed = 1.5;
 
   function handleMouseMove(event) {
+    camera.position.x = 0;
+    camera.position.y = 10;
+    camera.position.z = 10;
     //event.preventDefault();
+    // while (camera.position.y > 1) {
+    //   camera.position.y -= 1;
+    //   camera.position.z -= 1;
+    // }
 
+
+    const interval = setInterval(() => {
+      camera.position.y -= zoomSpeed * 0.55;
+      camera.position.z -= zoomSpeed * 0.2;
+      cabin.rotation.x += 0.08;
+
+
+      console.log(camera.position.y);
+      //console.log(camera.position.z);
+      //console.log(cabin.rotation.x);
+
+
+      if (camera.position.y < -9) {
+        clearInterval(interval);
+        //scene.remove(camera);
+      }
+    }, 40);
+
+    //menuClick('/index.html');
     if (cabin) {
       window.removeEventListener("click", handleMouseMove);
 
-      setTimeout(function () {
-        window.location.href = "./index.html"; // 새로운 페이지로 이동
-      }, 1000); // 5000 밀리초 (5초) 지연
+      // setTimeout(function () {
+      //   window.location.href = "./index.html"; // 새로운 페이지로 이동
+      // }, 1000); // 5000 밀리초 (5초) 지연
     }
   }
+
+  var menuClick = function (url) {
+    if (url == '/tiny_cabin_view') {
+      location.reload(true);
+      return;
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: url,
+      async: false,
+      data: "",
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+      success: function (data) {
+        $('#Container').html(data);
+
+        if (isMenuHide) menuOff();
+      },
+      error: function (request, status, error) {
+        alert(error);
+      }
+    });
+  };
+
 
   function handleResize() {
     const canvas = document.getElementById("gl-canvas");

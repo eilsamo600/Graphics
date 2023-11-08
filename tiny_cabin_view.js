@@ -136,11 +136,6 @@ window.onload = function init() {
     camera.position.x = 0;
     camera.position.y = 10;
     camera.position.z = 10;
-    //event.preventDefault();
-    // while (camera.position.y > 1) {
-    //   camera.position.y -= 1;
-    //   camera.position.z -= 1;
-    // }
 
 
     const interval = setInterval(() => {
@@ -164,32 +159,32 @@ window.onload = function init() {
     if (cabin) {
       window.removeEventListener("click", handleMouseMove);
 
-      // setTimeout(function () {
-      //   window.location.href = "./index.html"; // 새로운 페이지로 이동
-      // }, 1000); // 5000 밀리초 (5초) 지연
+      setTimeout(function () {
+        //window.location.href = "./index.html"; // 새로운 페이지로 이동
+
+        movePage('. /index.html');
+      }, 1000); // 5000 밀리초 (5초) 지연
     }
   }
 
-  var menuClick = function (url) {
-    if (url == '/tiny_cabin_view') {
-      location.reload(true);
-      return;
-    }
-
-    $.ajax({
-      type: 'POST',
+  function movePage(url) {
+    // if (url == '/tiny_cabin_view') {
+    //   location.reload(true);
+    //   return;
+    // }
+    var ajaxOption = {
       url: url,
-      async: false,
-      data: "",
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      success: function (data) {
-        $('#Container').html(data);
+      async: true,
+      type: "POST",
+      dataType: "html",
+      cache: false
+    };
 
-        if (isMenuHide) menuOff();
-      },
-      error: function (request, status, error) {
-        alert(error);
-      }
+    $.ajax(ajaxOption).done(function (data) {
+      // Contents 영역 삭제
+      $('#bodyContents').children().remove();
+      // Contents 영역 교체
+      $('#bodyContents').html(data);
     });
   };
 

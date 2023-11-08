@@ -453,7 +453,7 @@ class AnimalCrossing {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);
-      // sound.play();
+      sound.play();
     });
 
 
@@ -478,7 +478,7 @@ class AnimalCrossing {
     const sky = new THREE.Mesh(skyGeo, skyMat);
     this._scene.add(sky);
 
-    
+
 
     this._previousRAF = null;
 
@@ -493,7 +493,7 @@ class AnimalCrossing {
     // 추가: R 키 눌렀을 때 카메라 전환 변수
     this._isOrbitCamera = false;
 
-    const hlight = new THREE.AmbientLight (0x404040,50);
+    const hlight = new THREE.AmbientLight(0x404040, 50);
     this._scene.add(hlight);
     // const light = new THREE.PointLight(0xc4c4c4,10);
     // light.position.set(0,3000,5000);
@@ -560,11 +560,11 @@ class AnimalCrossing {
 
   _ToggleCameraMode() {
     this._isOrbitCamera = !this._isOrbitCamera;
-  
+
     if (this._isOrbitCamera) {
       this._orbitControls.enabled = true;
       this._thirdPersonCamera.Disable();
-      
+
       this._orbitControls.target.copy(this._controls.target.position);
     } else {
 
@@ -573,9 +573,9 @@ class AnimalCrossing {
     }
   }
 
-  _RayForCollision(){
+  _RayForCollision() {
 
-    if(!this.model){
+    if (!this.model) {
       return;
     }
 
@@ -619,7 +619,7 @@ class AnimalCrossing {
     const minFrontDistance = 0.5;
     const maxBackDistance = 0.5;
 
-    
+
 
     if (frontIntersections.length > 0) {
       // 앞쪽에 장애물이 있을 경우
@@ -651,7 +651,7 @@ class AnimalCrossing {
     }
 
     if (this._controls.target != null) {
-      
+
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
 
       this._RayForCollision();

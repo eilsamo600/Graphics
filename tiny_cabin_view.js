@@ -21,7 +21,7 @@ window.onload = function init() {
   camera.position.z = 10;
 
   // 빛을 생성합니다. (색상, 세기)
-  const light = new THREE.PointLight(0xffffff, 3);
+  const light = new THREE.PointLight(0xffffff, 2);
   light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
   scene.add(light); // 빛을 씬에 추가합니다.
 
@@ -40,7 +40,7 @@ window.onload = function init() {
     "resources/map/map_ball.glb",
     function (gltf) {
       cabin = gltf.scene;
-      cabin.scale.set(7, 7, 7);
+      cabin.scale.set(9, 9, 9);
       cabin.position.setY(-5);
       cabin.rotation.x = -0.5;
 
@@ -53,7 +53,7 @@ window.onload = function init() {
       console.error(error);
     }
   );
-  const planeSpeed = 4.0;
+  const planeSpeed = 5.0;
 
   loader.load(
     "resources/paper_plane/scene.gltf",

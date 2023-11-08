@@ -499,7 +499,7 @@ class AnimalCrossing {
     // light.position.set(0,3000,5000);
     // this._scene.add(light);
 
-    this._RAF();
+    this._RAF();//
 
   }
 

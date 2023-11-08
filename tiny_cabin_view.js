@@ -9,16 +9,19 @@ window.onload = function init() {
   const scene = new THREE.Scene();
   scene.background = new THREE.CanvasTexture(generateGradientCanvas());
 
+  const fov = 60;
+  const aspect = 1920 / 1080;
+  const near = 1.0;
+  const far = 1000.0;
+
   camera = new THREE.PerspectiveCamera(
-    75,
-    canvas.width / canvas.height,
-    0.1,
-    1000
+    fov,
+    aspect,
+    near,
+    far
   );
 
-  //camera.position.x = 7;
-  camera.position.y = 10;
-  camera.position.z = 10;
+  camera.position.set(25, 10, 25);
 
   const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
   hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -68,6 +71,8 @@ window.onload = function init() {
     }
   );
   const planeSpeed = 4.0;
+
+  // controls.target.copy(cabin.position);
 
   loader.load(
     "resources/paper_plane/scene.gltf",

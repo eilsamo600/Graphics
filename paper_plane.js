@@ -4,6 +4,7 @@ window.onload = function init() {
 	const canvas = document.getElementById("gl-canvas");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
+
 	let hasMouseClickExecuted = false;
 	const renderer = new THREE.WebGLRenderer({ canvas });
 	renderer.setSize(canvas.width, canvas.height);
@@ -72,16 +73,13 @@ window.onload = function init() {
 
 		renderer.render(scene, camera);
 	}
-
 	function generateGradientCanvas(check) {
 		let text = "";
-		if(check){
-			text = "Click the scrren to start";
-		}else{
-			text = "";
+		if (check) {
+			text = "Click the screen to start";
 		}
 
-		const dpi = window.devicePixelRatio || 1; // 현재 장치의 DPI를 가져옵니다.
+		const dpi = window.devicePixelRatio || 1;
 		const screenWidth = window.innerWidth;
 		const screenHeight = window.innerHeight;
 
@@ -89,30 +87,40 @@ window.onload = function init() {
 		canvas.width = screenWidth * dpi;
 		canvas.height = screenHeight * dpi;
 
-		this.context = canvas.getContext("2d");
-		this.context.scale(dpi, dpi); // 캔버스의 크기를 DPI에 맞게 확대합니다.
-
-		// const text = "";
-		const fontSize = canvas.width / (text.length * 1.8); // 텍스트 크기를 DPI에 맞게 설정합니다.
+		const context = canvas.getContext("2d");
+		context.scale(dpi, dpi);
 
 		const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
 		gradient.addColorStop(0, '#e3f2ff');
 		gradient.addColorStop(0.5, '#ede3ff');
 		gradient.addColorStop(1, '#ffe3f9');
 
-		this.context.fillStyle = gradient;
-		this.context.fillRect(0, 0, canvas.width, canvas.height);
+		context.fillStyle = gradient;
+		context.fillRect(0, 0, canvas.width, canvas.height);
 
+		const fontSize = canvas.width / (text.length * 1.8);
 		context.font = fontSize + "px Arial";
 		context.fillStyle = "rgb(255, 255, 255)";
 
-		const textWidth = context.measureText(text).width;
-		const textX = canvas.width / 7.5;
+		context.textAlign = "end";
+		context.textBaseline = "end";
+
+		// 텍스트의 크기를 가져오기 위해 임시로 텍스트를 그림
+		const textMetrics = context.measureText(text);
+		const textWidth = textMetrics.width;
+
+		// 캔버스의 중앙에 텍스트를 위치시키기 위해 x 좌표 계산
+		const textX = (canvas.width - textWidth) / 2;
+		// 캔버스의 중앙에 텍스트를 위치시키기 위해 y 좌표 계산
 		const textY = canvas.height / 8;
+		console.log(textX);
+		console.log(textY);
 		context.fillText(text, textX, textY);
 
 		return canvas;
 	}
+
+
 
 
 	const planeSpeed = 5.0;
@@ -171,6 +179,7 @@ window.onload = function init() {
 			const interval2 = setInterval(() => {
 
 				if (isSoundPlaying == true & plane.position.x == -25.5) {
+					sound.pause();
 					sound.play();
 					isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
 				}

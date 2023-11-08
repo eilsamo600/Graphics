@@ -9,23 +9,44 @@ window.onload = function init() {
   const scene = new THREE.Scene();
   scene.background = new THREE.CanvasTexture(generateGradientCanvas());
 
+  const fov = 60;
+  const aspect = 1920 / 1080;
+  const near = 1.0;
+  const far = 1000.0;
+
   camera = new THREE.PerspectiveCamera(
-    75,
-    canvas.width / canvas.height,
-    0.1,
-    1000
+    fov,
+    aspect,
+    near,
+    far
   );
 
-  //camera.position.x = 7;
-  camera.position.y = 10;
-  camera.position.z = 10;
+  camera.position.set(25, 10, 25);
 
   // 빛을 생성합니다. (색상, 세기)
-  const light = new THREE.PointLight(0xffffff, 3);
+  const light = new THREE.PointLight(0xffffff, 2);
   light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
   scene.add(light); // 빛을 씬에 추가합니다.
+  const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
+  hemiLight.color.setHSL(0.6, 1, 0.6);
+  hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 
-  scene.add(new THREE.AmbientLight(0xdde4f0));
+  scene.add(hemiLight)
+
+  const uniforms = {
+    "topColor": { value: new THREE.Color(0x0077ff) },
+    "bottomColor": { value: new THREE.Color(0xffffff) },
+    "offset": { value: 33 },
+    "exponent": { value: 0.6 }
+  };
+  uniforms["topColor"].value.copy(hemiLight.color);
+
+  // 빛을 생성합니다. (색상, 세기)
+  // const light = new THREE.PointLight(0xffffff, 3);
+  // light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
+  // scene.add(light); // 빛을 씬에 추가합니다.
+
+  scene.add(new THREE.AmbientLight(0x303030 , 8));
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -40,7 +61,7 @@ window.onload = function init() {
     "resources/map/map_ball.glb",
     function (gltf) {
       cabin = gltf.scene;
-      cabin.scale.set(7, 7, 7);
+      cabin.scale.set(9, 9, 9);
       cabin.position.setY(-5);
       cabin.rotation.x = -0.5;
 
@@ -53,7 +74,9 @@ window.onload = function init() {
       console.error(error);
     }
   );
-  const planeSpeed = 4.0;
+  const planeSpeed = 5.0;
+
+  // controls.target.copy(cabin.position);
 
   loader.load(
     "resources/paper_plane/scene.gltf",

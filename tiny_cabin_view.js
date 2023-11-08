@@ -20,12 +20,26 @@ window.onload = function init() {
   camera.position.y = 10;
   camera.position.z = 10;
 
-  // 빛을 생성합니다. (색상, 세기)
-  const light = new THREE.PointLight(0xffffff, 3);
-  light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
-  scene.add(light); // 빛을 씬에 추가합니다.
+  const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
+  hemiLight.color.setHSL(0.6, 1, 0.6);
+  hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 
-  scene.add(new THREE.AmbientLight(0xdde4f0));
+  scene.add(hemiLight)
+
+  const uniforms = {
+    "topColor": { value: new THREE.Color(0x0077ff) },
+    "bottomColor": { value: new THREE.Color(0xffffff) },
+    "offset": { value: 33 },
+    "exponent": { value: 0.6 }
+  };
+  uniforms["topColor"].value.copy(hemiLight.color);
+
+  // 빛을 생성합니다. (색상, 세기)
+  // const light = new THREE.PointLight(0xffffff, 3);
+  // light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
+  // scene.add(light); // 빛을 씬에 추가합니다.
+
+  scene.add(new THREE.AmbientLight(0x303030 , 8));
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
 

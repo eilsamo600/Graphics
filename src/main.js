@@ -493,6 +493,12 @@ class AnimalCrossing {
     // 추가: R 키 눌렀을 때 카메라 전환 변수
     this._isOrbitCamera = false;
 
+    const hlight = new THREE.AmbientLight (0x404040,50);
+    this._scene.add(hlight);
+    // const light = new THREE.PointLight(0xc4c4c4,10);
+    // light.position.set(0,3000,5000);
+    // this._scene.add(light);
+
     this._RAF();
 
   }

@@ -13,6 +13,8 @@ window.onload = function init() {
 	this.check = 1;
 	scene.background = new THREE.CanvasTexture(generateGradientCanvas(this.check));
 
+	const textContainer = document.getElementById("text-container");
+
 
 	camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
 
@@ -98,24 +100,23 @@ window.onload = function init() {
 		context.fillStyle = gradient;
 		context.fillRect(0, 0, canvas.width, canvas.height);
 
-		const fontSize = canvas.width / (text.length * 1.8);
-		context.font = fontSize + "px Arial";
-		context.fillStyle = "rgb(255, 255, 255)";
+		// const fontSize = canvas.width / (text.length * 1.8);
+		// context.font = fontSize + "px Arial";
+		// context.fillStyle = "rgb(255, 255, 255)";
 
-		context.textAlign = "end";
-		context.textBaseline = "end";
+		// context.textAlign = "center";
 
-		// 텍스트의 크기를 가져오기 위해 임시로 텍스트를 그림
-		const textMetrics = context.measureText(text);
-		const textWidth = textMetrics.width;
+		// // 텍스트의 크기를 가져오기 위해 임시로 텍스트를 그림
+		// const textMetrics = context.measureText(text);
+		// const textWidth = textMetrics.width;
 
-		// 캔버스의 중앙에 텍스트를 위치시키기 위해 x 좌표 계산
-		const textX = (canvas.width - textWidth) / 2;
-		// 캔버스의 중앙에 텍스트를 위치시키기 위해 y 좌표 계산
-		const textY = canvas.height / 8;
-		console.log(textX);
-		console.log(textY);
-		context.fillText(text, textX, textY);
+		// // 캔버스의 중앙에 텍스트를 위치시키기 위해 x 좌표 계산
+		// const textX = canvas.width / 2 - textWidth / 2;
+		// // 캔버스의 중앙에 텍스트를 위치시키기 위해 y 좌표 계산
+		// const textY = canvas.height / 8;
+		// console.log(textX);
+		// console.log(textY);
+		// context.fillText(text, textX, textY);
 
 		return canvas;
 	}
@@ -224,7 +225,7 @@ window.onload = function init() {
 		this.check = 0;
 		// Call your function when the mouse is released
 		scene.background = new THREE.CanvasTexture(generateGradientCanvas(check));
-
+		textContainer.style.display = "none";
 		console.log('click');
 		handleMouseClick();
 

@@ -177,8 +177,13 @@ window.onload = function init() {
         //scene.remove(camera);
       }
     }, 40);
+    setTimeout(function () {
+      //menuClick("/index.html")
+      // const url = "/index.html"
+      // history.pushState(null, null, url);
+      //location.replace("index.html");
+    }, 1500);
 
-    //menuClick('/index.html');
     if (cabin) {
       window.removeEventListener("dblclick", handleMouseMove);
 
@@ -190,26 +195,39 @@ window.onload = function init() {
     }
   }
 
-  function movePage(url) {
-    // if (url == '/tiny_cabin_view') {
-    //   location.reload(true);
-    //   return;
-    // }
-    var ajaxOption = {
-      url: url,
-      async: true,
-      type: "POST",
-      dataType: "html",
-      cache: false
-    };
+  // var menuClick = function (url) {
+  //   if (url == '/tiny_cabin_view') {
+  //     location.reload(true);
+  //     return;
+  //   }
 
-    $.ajax(ajaxOption).done(function (data) {
-      // Contents 영역 삭제
-      $('#bodyContents').children().remove();
-      // Contents 영역 교체
-      $('#bodyContents').html(data);
+  //   $.ajax({
+  //     type: 'POST',
+  //     url: url,
+  //     async: false,
+  //     data: "",
+  //     contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+  //     success: function (data) {
+  //       $('#Container').html(data);
+
+  //       if (isMenuHide) menuOff();
+  //     },
+  //     error: function (request, status, error) {
+  //       alert(error);
+  //     }
+  //   });
+  // };
+  var menuClick = function (url) {
+    // AJAX 요청을 통해 데이터를 받아옵니다.
+    $.get(url, function (data) {
+      // 받아온 데이터를 페이지에 적용합니다.
+      $('#Container').html(data);
+      // 페이지의 일부분만 업데이트했으므로, 히스토리를 업데이트합니다.
+      history.pushState(null, null, url);
+      if (isMenuHide) menuOff();
     });
   };
+
 
 
   function handleResize() {

@@ -131,8 +131,9 @@ window.onload = function init() {
 
 		if (!hasMouseClickExecuted && plane) {
 			hasMouseClickExecuted = true;
-			sound.pause();
+
 			sound.play();
+
 			isSoundPlaying = false;
 			// 마우스 이벤트 리스너 제거
 			window.removeEventListener('click', handleMouseClick);
@@ -150,6 +151,7 @@ window.onload = function init() {
 					const interval1EndTime = Date.now() + 1000;
 					const interval1Duration = interval1EndTime - interval1StartTime;
 					setTimeout(() => {
+
 						startSecondInterval();
 						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
 					}, interval1Duration);
@@ -177,6 +179,7 @@ window.onload = function init() {
 			camera.position.z = 13;
 
 			const interval2 = setInterval(() => {
+
 
 				if (isSoundPlaying == true & plane.position.x == -25.5) {
 					sound.pause();

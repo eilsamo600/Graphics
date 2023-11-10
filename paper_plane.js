@@ -92,35 +92,16 @@ window.onload = function init() {
 		const context = canvas.getContext("2d");
 		context.scale(dpi, dpi);
 
-		const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+		const gradient = context.createLinearGradient(0, 0, screenWidth, screenHeight);
 		gradient.addColorStop(0, '#e3f2ff');
 		gradient.addColorStop(0.5, '#ede3ff');
 		gradient.addColorStop(1, '#ffe3f9');
 
 		context.fillStyle = gradient;
-		context.fillRect(0, 0, canvas.width, canvas.height);
-
-		// const fontSize = canvas.width / (text.length * 1.8);
-		// context.font = fontSize + "px Arial";
-		// context.fillStyle = "rgb(255, 255, 255)";
-
-		// context.textAlign = "center";
-
-		// // 텍스트의 크기를 가져오기 위해 임시로 텍스트를 그림
-		// const textMetrics = context.measureText(text);
-		// const textWidth = textMetrics.width;
-
-		// // 캔버스의 중앙에 텍스트를 위치시키기 위해 x 좌표 계산
-		// const textX = canvas.width / 2 - textWidth / 2;
-		// // 캔버스의 중앙에 텍스트를 위치시키기 위해 y 좌표 계산
-		// const textY = canvas.height / 8;
-		// console.log(textX);
-		// console.log(textY);
-		// context.fillText(text, textX, textY);
+		context.fillRect(0, 0, screenWidth, screenHeight);
 
 		return canvas;
 	}
-
 
 
 

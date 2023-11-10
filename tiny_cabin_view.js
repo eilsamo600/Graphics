@@ -46,7 +46,7 @@ window.onload = function init() {
   // light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
   // scene.add(light); // 빛을 씬에 추가합니다.
 
-  scene.add(new THREE.AmbientLight(0x303030 , 8));
+  scene.add(new THREE.AmbientLight(0x303030, 8));
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -180,7 +180,7 @@ window.onload = function init() {
 
     //menuClick('/index.html');
     if (cabin) {
-      window.removeEventListener("click", handleMouseMove);
+      window.removeEventListener("dblclick", handleMouseMove);
 
       setTimeout(function () {
         //window.location.href = "./index.html"; // 새로운 페이지로 이동
@@ -225,5 +225,5 @@ window.onload = function init() {
   }
 
   window.addEventListener("resize", handleResize);
-  window.addEventListener("click", handleMouseMove);
+  window.addEventListener("dblclick", handleMouseMove);
 };

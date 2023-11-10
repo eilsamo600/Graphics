@@ -76,10 +76,10 @@ window.onload = function init() {
 		renderer.render(scene, camera);
 	}
 	function generateGradientCanvas(check) {
-		let text = "";
-		if (check) {
-			text = "Click the screen to start";
-		}
+		// let text = "";
+		// if (check) {
+		// 	text = "Click the screen to start";
+		// }
 
 		const dpi = window.devicePixelRatio || 1;
 		const screenWidth = window.innerWidth;

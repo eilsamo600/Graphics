@@ -484,6 +484,7 @@ class AnimalCrossing {
 
     this._loadMap();
     this._LoadAnimatedModel();
+    this._loadPlane();
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
@@ -495,11 +496,8 @@ class AnimalCrossing {
 
     const hlight = new THREE.AmbientLight(0x404040, 50);
     this._scene.add(hlight);
-    // const light = new THREE.PointLight(0xc4c4c4,10);
-    // light.position.set(0,3000,5000);
-    // this._scene.add(light);
 
-    this._RAF();//
+    this._RAF();
 
   }
 
@@ -570,6 +568,15 @@ class AnimalCrossing {
 
       this._orbitControls.enabled = false;
       this._thirdPersonCamera.Enable();
+    }
+  }
+
+  _toggleObjectVisibility() {
+    if (this.model) {
+      this.model.visible = !this.model.visible;
+    }
+    if(this._controls){
+      this._controls.target.visible = !this._controls.target.visible;
     }
   }
 
@@ -652,8 +659,8 @@ class AnimalCrossing {
 
     if (this._controls.target != null) {
 
+      // this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
-
       this._RayForCollision();
 
     }
@@ -670,6 +677,8 @@ class AnimalCrossing {
       case 82: // R
         this._ToggleCameraMode();
         break;
+      case 84: // T
+        this._toggleObjectVisibility();
     }
   }
 
@@ -680,3 +689,6 @@ let _APP = null;
 window.addEventListener('DOMContentLoaded', () => {
   _APP = new AnimalCrossing();
 });
+
+
+

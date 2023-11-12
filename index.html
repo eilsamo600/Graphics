@@ -1,22 +1,20 @@
-<!DOCTYPE html>
 <html>
-
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="importmap">
-            {
-        "imports":{
-            "three": "./node_modules/three/build/three.module.js"
-        }   
-    }
-
-    </script>
-    <script type="module" src="./src/main.js" defer></script>
-</head>
+<script type="text/javascript" src="js/three.min.js"></script>
+<script type="text/javascript" src="js/GLTFLoader.js"></script>
+<script type="text/javascript" src="js/OrbitControls.js"></script>
+<script type="text/javascript" src="index.js"></script>
 
 <body>
-    <div id="container"></div>
-    <div id="controls"></div>
+
+    <canvas id="gl-canvas" width="1920" height="1080">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <div id="text-container"
+        style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-family: Arial, sans-serif; font-size: 3.5vw; color: white; pointer-events: none; display: block;">
+        Click the screen to start
+    </div>
+
+
 </body>
 
 </html>

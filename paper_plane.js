@@ -18,7 +18,6 @@ window.onload = function init() {
 
 	camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
 
-	//camera.position.x = 7;
 	camera.position.y = 10;
 	camera.position.z = 10;
 
@@ -57,8 +56,7 @@ window.onload = function init() {
 		function (gltf) {
 			cabin = gltf.scene;
 			cabin.scale.set(7, 7, 7);
-			cabin.position.setY(-1);
-			//plane.rotation.y = 1;
+			cabin.position.setY(-2);
 
 			scene.add(cabin);
 			if (this.cabin) {
@@ -95,10 +93,6 @@ window.onload = function init() {
 		renderer.render(scene, camera);
 	}
 	function generateGradientCanvas(check) {
-		// let text = "";
-		// if (check) {
-		// 	text = "Click the screen to start";
-		// }
 
 		const dpi = window.devicePixelRatio || 1;
 		const screenWidth = window.innerWidth;
@@ -112,8 +106,9 @@ window.onload = function init() {
 		context.scale(dpi, dpi);
 
 		const gradient = context.createLinearGradient(0, 0, screenWidth, screenHeight);
-		gradient.addColorStop(0, '#e3f2ff');
-		gradient.addColorStop(0.5, '#ede3ff');
+		gradient.addColorStop(0.8, '#e1f5fc');
+		gradient.addColorStop(0, '#dff3f7');
+		gradient.addColorStop(0.4, '#d1e6ff');
 		gradient.addColorStop(1, '#ffe3f9');
 
 		context.fillStyle = gradient;
@@ -160,14 +155,7 @@ window.onload = function init() {
 				}
 			}, 23);
 
-			if (plane) {
 
-
-				// 5초 후에 페이지 이동
-				// setTimeout(function () {
-				// 	window.location.href = "./tiny_cabin_view.html"; // 새로운 페이지로 이동
-				// }, 4500); // 5000 밀리초 (5초) 지연
-			}
 
 		}
 
@@ -199,9 +187,8 @@ window.onload = function init() {
 					clearInterval(interval2);
 					if (this.cabin) {
 						this.cabin.visible = !this.cabin.visible;
-						//console.log("cabin");
+
 						scene.remove(plane);
-						//scene.remove(light1);
 
 						// Change 'const' to 'let'
 						let fov = 60;
@@ -233,14 +220,13 @@ window.onload = function init() {
 
 						// 빛을 생성합니다. (색상, 세기)
 						const light = new THREE.PointLight(0x002fff, 3);
-						light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
+						light.position.set(1, 0, 5); // 빛의 위치를 조절합니다.
 						scene.add(light); // 빛을 씬에 추가합니다.
-
 
 						scene.add(new THREE.AmbientLight(0x303030, 9));
 
-						//controls = new THREE.OrbitControls(camera, renderer.domElement);
-						//const controls2 = new MapControls( camera, renderer.domElement );
+						scene.add(new THREE.AmbientLight(0x000030, 3));
+
 						controls.enableDamping = true;
 
 						controls.enableRotate = true; //마우스로 움직이는거 함
@@ -254,8 +240,6 @@ window.onload = function init() {
 
 		}
 
-
-		// 마우스 이벤트를 감지하고 위의 함수를 호출
 
 
 	}
@@ -281,17 +265,10 @@ window.onload = function init() {
 		const interval = setInterval(() => {
 			camera.position.y -= zoomSpeed * 0.55;
 			camera.position.z -= zoomSpeed * 0.2;
-			cabin.rotation.x += 0.08;
+			cabin.rotation.x += 0.09;
 
-
-			// console.log(camera.position.y);
-			//console.log(camera.position.z);
-			//console.log(cabin.rotation.x);
-
-
-			if (camera.position.y < -9) {
+			if (camera.position.y < -7) {
 				clearInterval(interval);
-				//scene.remove(camera);
 			}
 		}, 40);
 

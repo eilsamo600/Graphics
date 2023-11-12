@@ -170,7 +170,6 @@ window.onload = function init() {
 
 		}
 
-
 		function startSecondInterval() {
 			plane.rotation.y = Math.PI / 1.7;
 			plane.rotation.z = Math.PI / -2.5;
@@ -199,8 +198,58 @@ window.onload = function init() {
 					clearInterval(interval2);
 					if (this.cabin) {
 						this.cabin.visible = !this.cabin.visible;
+						console.log("cabin");
+
+						// Change 'const' to 'let'
+						let fov = 60;
+						let aspect = 1920 / 1080;
+						let near = 1.0;
+						let far = 1000.0;
+
+						// Also changing 'camera' to 'let'
+						let camera = new THREE.PerspectiveCamera(
+							fov,
+							aspect,
+							near,
+							far
+						);
+						camera.position.set(25, 10, 25);
+
+						const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
+						hemiLight.color.setHSL(0.6, 1, 0.6);
+						hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+
+						scene.add(hemiLight);
+
+						const hlight = new THREE.AmbientLight(0x404040, 1);
+						scene.add(hlight);
+
+						const uniforms = {
+							"topColor": { value: new THREE.Color(0x0077ff) },
+							"bottomColor": { value: new THREE.Color(0xffffff) },
+							"offset": { value: 33 },
+							"exponent": { value: 0.6 }
+						};
+						uniforms["topColor"].value.copy(hemiLight.color);
+
+						// 빛을 생성합니다. (색상, 세기)
+						let light = new THREE.PointLight(0x002fff, 3);
+						light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
+						scene.add(light); // 빛을 씬에 추가합니다.
+
+						scene.add(new THREE.AmbientLight(0x303030, 9));
+
+						//controls = new THREE.OrbitControls(camera, renderer.domElement);
+						//const controls2 = new MapControls( camera, renderer.domElement );
+						controls.enableDamping = true;
+
+						controls.enableRotate = true; //마우스로 움직이는거 함
+						controls.enableZoom = true; //마우스로 확대축소 함
+
+
 					}
 				}
+
 			}, 23);
 
 		}
@@ -222,9 +271,42 @@ window.onload = function init() {
 		scene.background = new THREE.CanvasTexture(generateGradientCanvas(check));
 
 	}
+	const zoomSpeed = 1.5;
+	function handleMouseMove() {
+		camera.position.x = 0;
+		camera.position.y = 10;
+		camera.position.z = 10;
+
+
+		const interval = setInterval(() => {
+			camera.position.y -= zoomSpeed * 0.55;
+			camera.position.z -= zoomSpeed * 0.2;
+			cabin.rotation.x += 0.08;
+
+
+			// console.log(camera.position.y);
+			//console.log(camera.position.z);
+			//console.log(cabin.rotation.x);
+
+
+			if (camera.position.y < -9) {
+				clearInterval(interval);
+				//scene.remove(camera);
+			}
+		}, 40);
+
+		if (cabin) {
+			window.removeEventListener("dblclick", handleMouseMove);
+
+			setTimeout(function () {
+				window.location.href = "/index.html"; // 새로운 페이지로 이동
+
+			}, 1000); // 5000 밀리초 (5초) 지연
+		}
+	}
 
 	window.addEventListener('resize', handleResize);
-
+	window.addEventListener("dblclick", handleMouseMove);
 	window.addEventListener('click', () => {
 		this.check = 0;
 		// Call your function when the mouse is released
@@ -235,52 +317,6 @@ window.onload = function init() {
 
 	});
 
-
-	if (this.cabin.visible && cabin) {
-		const fov = 60;
-		const aspect = 1920 / 1080;
-		const near = 1.0;
-		const far = 1000.0;
-
-		camera = new THREE.PerspectiveCamera(
-			fov,
-			aspect,
-			near,
-			far
-		);
-		camera.position.set(25, 10, 25);
-
-		const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
-		hemiLight.color.setHSL(0.6, 1, 0.6);
-		hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-
-		scene.add(hemiLight)
-
-		const hlight = new THREE.AmbientLight(0x404040, 1);
-		scene.add(hlight);
-
-		const uniforms = {
-			"topColor": { value: new THREE.Color(0x0077ff) },
-			"bottomColor": { value: new THREE.Color(0xffffff) },
-			"offset": { value: 33 },
-			"exponent": { value: 0.6 }
-		};
-		uniforms["topColor"].value.copy(hemiLight.color);
-
-		// 빛을 생성합니다. (색상, 세기)
-		light = new THREE.PointLight(0x002fff, 3);
-		light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
-		scene.add(light); // 빛을 씬에 추가합니다.
-
-		scene.add(new THREE.AmbientLight(0x303030, 9));
-
-		//controls = new THREE.OrbitControls(camera, renderer.domElement);
-		//const controls2 = new MapControls( camera, renderer.domElement );
-		controls.enableDamping = true;
-
-		controls.enableRotate = true; //마우스로 움직이는거 함
-		controls.enableZoom = true; //마우스로 확대축소 함
-	}
 
 
 }

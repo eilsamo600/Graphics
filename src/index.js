@@ -278,11 +278,11 @@ window.onload = function init() {
 		scene.background = new THREE.CanvasTexture(generateGradientCanvas(check));
 
 	}
-	const zoomSpeed = 1.5;
 	/*
 		Description: Handles the mouse move event. Double-click changes the camera's position into the cabin, 
 		effectively entering the glass sphere
 	*/
+	const zoomSpeed = 1.5;
 	function handleMouseMove() {
 		camera.position.x = 0;
 		camera.position.y = 10;

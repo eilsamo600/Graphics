@@ -3,9 +3,9 @@
  * https://github.com/simondevyoutube/
  */
 
-import * as THREE from 'three/build/three.module.js'
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import * as THREE from '../node_modules/three/build/three.module.js'
+import { GLTFLoader } from '../node_modules/three/examples/jsm/loaders/GLTFLoader.js'
+import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js"
 
 const _VS = `
 varying vec3 vWorldPosition;
@@ -599,7 +599,7 @@ class AnimalCrossing {
 
 
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('name2.png');
+    const texture = textureLoader.load('resources/members_infro.png');
 
     const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
@@ -682,8 +682,6 @@ class AnimalCrossing {
 
     frontRaycaster.set(characterPosition, frontRayDirection);
     const frontIntersections = frontRaycaster.intersectObject(this.model);
-
-    backRaycaster.set(characterPosition, backRayDirection);
 
     const minFrontDistance = 0.5;
 

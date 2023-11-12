@@ -47,10 +47,7 @@ window.onload = function init() {
 	const audioLoader = new THREE.AudioLoader();
 	audioLoader.load('sounds/Swoosh.ogg', function (buffer) {
 		sound.setBuffer(buffer);
-		//sound.setRefDistance(20);
-		//sound.setLoop(true);
 		sound.setVolume(0.2);
-		//sound.play();
 	});
 
 	const loader = new THREE.GLTFLoader();

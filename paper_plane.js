@@ -156,6 +156,7 @@ window.onload = function init() {
 						startSecondInterval();
 						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
 					}, interval1Duration);
+
 				}
 			}, 23);
 
@@ -200,7 +201,7 @@ window.onload = function init() {
 						this.cabin.visible = !this.cabin.visible;
 						//console.log("cabin");
 						scene.remove(plane);
-						scene.remove(light1);
+						//scene.remove(light1);
 
 						// Change 'const' to 'let'
 						let fov = 60;
@@ -221,10 +222,6 @@ window.onload = function init() {
 						hemiLight.color.setHSL(0.6, 1, 0.6);
 						hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 
-						scene.add(hemiLight);
-
-						const hlight = new THREE.AmbientLight(0x404040, 1);
-						scene.add(hlight);
 
 						const uniforms = {
 							"topColor": { value: new THREE.Color(0x0077ff) },
@@ -238,6 +235,7 @@ window.onload = function init() {
 						const light = new THREE.PointLight(0x002fff, 3);
 						light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
 						scene.add(light); // 빛을 씬에 추가합니다.
+
 
 						scene.add(new THREE.AmbientLight(0x303030, 9));
 
@@ -278,7 +276,6 @@ window.onload = function init() {
 		camera.position.x = 0;
 		camera.position.y = 10;
 		camera.position.z = 10;
-
 
 
 		const interval = setInterval(() => {

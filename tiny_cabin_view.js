@@ -23,15 +23,15 @@ window.onload = function init() {
 
   camera.position.set(25, 10, 25);
 
-  // 빛을 생성합니다. (색상, 세기)
-  const light = new THREE.PointLight(0xffffff, 2);
-  light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
-  scene.add(light); // 빛을 씬에 추가합니다.
+
   const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
   hemiLight.color.setHSL(0.6, 1, 0.6);
   hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 
   scene.add(hemiLight)
+
+  const hlight = new THREE.AmbientLight(0x404040, 1);
+  scene.add(hlight);
 
   const uniforms = {
     "topColor": { value: new THREE.Color(0x0077ff) },
@@ -46,12 +46,14 @@ window.onload = function init() {
   // light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
   // scene.add(light); // 빛을 씬에 추가합니다.
 
-  scene.add(new THREE.AmbientLight(0x303030, 8));
+  scene.add(new THREE.AmbientLight(0x303030, 9));
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
-
+  //const controls2 = new MapControls( camera, renderer.domElement );
+  controls.enableDamping = true;
+  
   controls.enableRotate = true; //마우스로 움직이는거 함
-  controls.enableZoom = false; //마우스로 확대축소 안함
+  controls.enableZoom = true; //마우스로 확대축소 함
 
   let cabin;
   let plane;
@@ -61,9 +63,17 @@ window.onload = function init() {
     "resources/map/map_ball.glb",
     function (gltf) {
       cabin = gltf.scene;
-      cabin.scale.set(9, 9, 9);
-      cabin.position.setY(-5);
-      cabin.rotation.x = -0.5;
+      cabin.scale.set(11, 11, 11);
+      cabin.position.setY(-4);
+      plane.rotation.y = 1;
+
+      // cabin.traverse((child)=>{
+      //   if(child.isMesh){
+      //     child.material = child.material.clone();
+      //     child.material.map = texture;
+      //   }
+      // });
+      // groupRef.current.add(cabin);
 
       scene.add(cabin);
 
@@ -83,23 +93,22 @@ window.onload = function init() {
     function (gltf) {
       plane = gltf.scene;
 
-      plane.rotation.x = -36;
-      plane.rotation.y = Math.PI / -2.6;
-      plane.rotation.z = Math.PI / 3.5;
+      plane.rotation.x = 0;
+      plane.rotation.y = 19;
+      plane.rotation.z = 0;
 
-      plane.position.x = 30;
+      plane.position.x = 20;
       plane.position.y = 10;
-      plane.position.z = 15;
-      camera.position.y = 12;
-      camera.position.z = 13;
+      plane.position.z = -19;
+
+      //camera.position.x = 12;
+      //camera.position.z = 13;
 
       scene.add(plane);
 
       animate();
       const interval = setInterval(() => {
-        plane.position.x -= planeSpeed * 0.1;
-        plane.position.y -= planeSpeed * 0.2;
-        plane.position.z -= planeSpeed * 0.2;
+        //plane.position.x -= planeSpeed * 0.3;
 
         //console.log(plane.position.x);
 

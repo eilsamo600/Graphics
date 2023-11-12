@@ -8,7 +8,7 @@ window.onload = function init() {
 	let hasMouseClickExecuted = false;
 	const renderer = new THREE.WebGLRenderer({ canvas });
 	renderer.setSize(canvas.width, canvas.height);
-	renderer.setClearColor(0x000000, 0); // 투명 배경
+	renderer.setClearColor(0x000000, 0); // Transparent background
 	const scene = new THREE.Scene();
 	this.check = 1;
 	scene.background = new THREE.CanvasTexture(generateGradientCanvas(this.check));
@@ -21,19 +21,19 @@ window.onload = function init() {
 	camera.position.y = 10;
 	camera.position.z = 10;
 
-	// 빛을 생성합니다. (색상, 세기)
+	// Create light (color, intensity)
 	const light1 = new THREE.PointLight(0xFFFFFF, 1);
-	light1.position.set(-30, 4, -10); // 빛의 위치를 조절합니다.
-	scene.add(light1); // 빛을 씬에 추가합니다.
+	light1.position.set(-30, 4, -10); // Adjust light position
+	scene.add(light1); // Add light to the scene
 
 	scene.add(new THREE.AmbientLight(0xdde4f0));
 
 	const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-	controls.enableRotate = false; //마우스로 움직이는거 안함
-	controls.enableZoom = false; //마우스로 확대축소 안함
+	controls.enableRotate = false; // Disables mouse rotation
+	controls.enableZoom = false; // Disables zooming
 
-	let plane
+	let plane;
 
 	// create an AudioListener and add it to the camera
 	const listener = new THREE.AudioListener();
@@ -51,6 +51,10 @@ window.onload = function init() {
 
 	const loader = new THREE.GLTFLoader();
 
+	/*
+		Load the cabin model and add it to the scene
+	*/
+
 	loader.load(
 		"resources/map/map_ball.glb",
 		function (gltf) {
@@ -62,8 +66,6 @@ window.onload = function init() {
 			if (this.cabin) {
 				this.cabin.visible = !this.cabin.visible;
 			}
-
-			//animate();
 		},
 		undefined,
 		function (error) {
@@ -71,12 +73,15 @@ window.onload = function init() {
 		}
 	);
 
+	/*
+		Load the paper_plane model and add it to the scene
+	*/
 	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
 
 		plane.rotation.x = 1.1;
 		plane.rotation.y = Math.PI / -2.0;
-		plane.rotation.z = Math.PI / 2.5;
+		plane.rotation.z = -5;
 
 		scene.add(plane);
 
@@ -85,19 +90,38 @@ window.onload = function init() {
 		console.error(error);
 	});
 
+	let time = 0;
+	/*
+		Description: Animates the scene. Make the plane rotate.
+		Param: noting.
+		Returns: noting.
+	*/
 	function animate() {
 		controls.update();
 		requestAnimationFrame(animate);
-		//if (plane) { plane.rotation.y += 0.01; }
 
+		plane.rotation.z = -100;
+		plane.rotation.x = Math.sin(time) * 0.4;
 		renderer.render(scene, camera);
+
+		time += 0.045; // Control the rotation speed of the plane
 	}
+
+
+
+	/*
+		Description: Generates a gradient canvas based on the screen size and a specific check value.
+		Param: A value used to determine the gradient.
+		Returns: {HTMLCanvasElement} - The canvas with a generated gradient.
+	*/
 	function generateGradientCanvas(check) {
 
+		// Determine the screen properties
 		const dpi = window.devicePixelRatio || 1;
 		const screenWidth = window.innerWidth;
 		const screenHeight = window.innerHeight;
 
+		// Create a canvas element
 		const canvas = document.createElement("canvas");
 		canvas.width = screenWidth * dpi;
 		canvas.height = screenHeight * dpi;
@@ -105,6 +129,7 @@ window.onload = function init() {
 		const context = canvas.getContext("2d");
 		context.scale(dpi, dpi);
 
+		// Define a linear gradient across the canvas
 		const gradient = context.createLinearGradient(0, 0, screenWidth, screenHeight);
 		gradient.addColorStop(0.8, '#e1f5fc');
 		gradient.addColorStop(0, '#dff3f7');
@@ -117,13 +142,15 @@ window.onload = function init() {
 		return canvas;
 	}
 
-
-
 	const planeSpeed = 5.0;
 	let isSoundPlaying = true;
 
+	/*
+		Description: Handles the mouse click event.
+		Param: {MouseEvent} - The mouse click event.
+		Returns: noting.
+	*/
 	function handleMouseClick(event) {
-
 
 		if (!hasMouseClickExecuted && plane) {
 			hasMouseClickExecuted = true;
@@ -131,7 +158,7 @@ window.onload = function init() {
 			sound.play();
 
 			isSoundPlaying = false;
-			// 마우스 이벤트 리스너 제거
+			// remove mouse click event listener
 			window.removeEventListener('click', handleMouseClick);
 
 			const interval1StartTime = Date.now();
@@ -139,9 +166,7 @@ window.onload = function init() {
 			const interval1 = setInterval(() => {
 				plane.position.x -= planeSpeed * 0.3;
 
-				//console.log(plane.position.y);
-
-				// plane.position.x가 원하는 위치에 도달하면 interval을 종료
+				// If the plane's x-position reaches the desired location, the interval stops
 				if (plane.position.x <= -37) {
 					clearInterval(interval1);
 					const interval1EndTime = Date.now() + 1000;
@@ -149,7 +174,8 @@ window.onload = function init() {
 					setTimeout(() => {
 
 						startSecondInterval();
-						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
+						// Resetting the sound playback state to true enables the next sound to play
+						isSoundPlaying = true;
 					}, interval1Duration);
 
 				}
@@ -159,6 +185,11 @@ window.onload = function init() {
 
 		}
 
+		/*
+			Description: Handles the second interval.
+			Param: noting.
+			Returns: noting.
+		*/
 		function startSecondInterval() {
 			plane.rotation.y = Math.PI / 1.7;
 			plane.rotation.z = Math.PI / -2.5;
@@ -174,29 +205,27 @@ window.onload = function init() {
 				if (isSoundPlaying == true & plane.position.x == -25.5) {
 					sound.pause();
 					sound.play();
-					isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
+					isSoundPlaying = false; // Altering the variable value to ensure the sound plays only once.
 				}
 
 				plane.position.x += planeSpeed * 0.3;
 				plane.position.y += planeSpeed * 0.02;
 				plane.position.z -= planeSpeed * 0.2;
 
-				//console.log(plane.position.x);
-
 				if (plane.position.x >= 120) {
 					clearInterval(interval2);
+
+					// Change cabin visibility to true
 					if (this.cabin) {
 						this.cabin.visible = !this.cabin.visible;
 
 						scene.remove(plane);
 
-						// Change 'const' to 'let'
 						let fov = 60;
 						let aspect = 1920 / 1080;
 						let near = 1.0;
 						let far = 1000.0;
 
-						// Also changing 'camera' to 'let'
 						let camera = new THREE.PerspectiveCamera(
 							fov,
 							aspect,
@@ -218,10 +247,10 @@ window.onload = function init() {
 						};
 						uniforms["topColor"].value.copy(hemiLight.color);
 
-						// 빛을 생성합니다. (색상, 세기)
+						// Create light (color, intensity)
 						const light = new THREE.PointLight(0x002fff, 3);
-						light.position.set(1, 0, 5); // 빛의 위치를 조절합니다.
-						scene.add(light); // 빛을 씬에 추가합니다.
+						light.position.set(1, 0, 5); // Adjust light position
+						scene.add(light); // Add light to the scene
 
 						scene.add(new THREE.AmbientLight(0x303030, 9));
 
@@ -229,8 +258,8 @@ window.onload = function init() {
 
 						controls.enableDamping = true;
 
-						controls.enableRotate = true; //마우스로 움직이는거 함
-						controls.enableZoom = true; //마우스로 확대축소 함
+						controls.enableRotate = true; // mouse move
+						controls.enableZoom = true; // mouse wheel
 
 
 					}
@@ -243,6 +272,11 @@ window.onload = function init() {
 
 
 	}
+	/*
+		Description: Handles the window resize event. The canvas size changes according to the changing window size.
+		Param: noting.
+		Returns: noting.
+	*/
 	function handleResize() {
 		const canvas = document.getElementById("gl-canvas");
 		canvas.width = window.innerWidth;
@@ -256,11 +290,16 @@ window.onload = function init() {
 
 	}
 	const zoomSpeed = 1.5;
+	/*
+		Description: Handles the mouse move event. Double-click changes the camera's position into the cabin, 
+		effectively entering the glass sphere
+		Param: noting.
+		Returns: noting.
+	*/
 	function handleMouseMove() {
 		camera.position.x = 0;
 		camera.position.y = 10;
 		camera.position.z = 10;
-
 
 		const interval = setInterval(() => {
 			camera.position.y -= zoomSpeed * 0.55;
@@ -276,9 +315,9 @@ window.onload = function init() {
 			window.removeEventListener("dblclick", handleMouseMove);
 
 			setTimeout(function () {
-				window.location.href = "/animal_crossing.html"; // 새로운 페이지로 이동
+				window.location.href = "/animal_crossing.html"; // Move to the next page
 
-			}, 1000); // 5000 밀리초 (5초) 지연
+			}, 1000); // Wait 1 second before moving to the next page
 		}
 	}
 
@@ -293,8 +332,6 @@ window.onload = function init() {
 		handleMouseClick();
 
 	});
-
-
 
 }
 

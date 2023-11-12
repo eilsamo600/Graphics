@@ -93,8 +93,6 @@ window.onload = function init() {
 	let time = 0;
 	/*
 		Description: Animates the scene. Make the plane rotate.
-		Param: noting.
-		Returns: noting.
 	*/
 	function animate() {
 		controls.update();
@@ -107,12 +105,8 @@ window.onload = function init() {
 		time += 0.045; // Control the rotation speed of the plane
 	}
 
-
-
 	/*
 		Description: Generates a gradient canvas based on the screen size and a specific check value.
-		Param: A value used to determine the gradient.
-		Returns: {HTMLCanvasElement} - The canvas with a generated gradient.
 	*/
 	function generateGradientCanvas(check) {
 
@@ -146,9 +140,7 @@ window.onload = function init() {
 	let isSoundPlaying = true;
 
 	/*
-		Description: Handles the mouse click event.
-		Param: {MouseEvent} - The mouse click event.
-		Returns: noting.
+		Description: Handles the mouse click event. The plane moves to the left and the sound plays.
 	*/
 	function handleMouseClick(event) {
 
@@ -173,6 +165,7 @@ window.onload = function init() {
 					const interval1Duration = interval1EndTime - interval1StartTime;
 					setTimeout(() => {
 
+						// The plane moves to the right and the sound plays
 						startSecondInterval();
 						// Resetting the sound playback state to true enables the next sound to play
 						isSoundPlaying = true;
@@ -187,8 +180,6 @@ window.onload = function init() {
 
 		/*
 			Description: Handles the second interval.
-			Param: noting.
-			Returns: noting.
 		*/
 		function startSecondInterval() {
 			plane.rotation.y = Math.PI / 1.7;
@@ -274,8 +265,6 @@ window.onload = function init() {
 	}
 	/*
 		Description: Handles the window resize event. The canvas size changes according to the changing window size.
-		Param: noting.
-		Returns: noting.
 	*/
 	function handleResize() {
 		const canvas = document.getElementById("gl-canvas");
@@ -293,8 +282,6 @@ window.onload = function init() {
 	/*
 		Description: Handles the mouse move event. Double-click changes the camera's position into the cabin, 
 		effectively entering the glass sphere
-		Param: noting.
-		Returns: noting.
 	*/
 	function handleMouseMove() {
 		camera.position.x = 0;

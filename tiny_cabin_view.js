@@ -51,7 +51,7 @@ window.onload = function init() {
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   //const controls2 = new MapControls( camera, renderer.domElement );
   controls.enableDamping = true;
-  
+
   controls.enableRotate = true; //마우스로 움직이는거 함
   controls.enableZoom = true; //마우스로 확대축소 함
 

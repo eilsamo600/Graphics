@@ -103,7 +103,7 @@ window.onload = function init() {
 
 
 	const planeSpeed = 5.0;
-	//let isSoundPlaying = true;
+	let isSoundPlaying = true;
 
 	function handleMouseClick(event) {
 
@@ -113,8 +113,7 @@ window.onload = function init() {
 
 			sound.play();
 
-			//isSoundPlaying = false;
-
+			isSoundPlaying = false;
 			// 마우스 이벤트 리스너 제거
 			window.removeEventListener('click', handleMouseClick);
 
@@ -133,7 +132,7 @@ window.onload = function init() {
 					setTimeout(() => {
 
 						startSecondInterval();
-						//isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
+						isSoundPlaying = true; // 소리 재생 상태를 다시 true로 설정하여 다음 소리 재생을 가능하게 합니다.
 					}, interval1Duration);
 				}
 			}, 23);
@@ -164,7 +163,7 @@ window.onload = function init() {
 				if (isSoundPlaying == true & plane.position.x == -25.5) {
 					sound.pause();
 					sound.play();
-					//isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
+					isSoundPlaying = false; // 소리를 한 번만 재생하도록 변수 값을 변경합니다.
 				}
 
 				plane.position.x += planeSpeed * 0.3;

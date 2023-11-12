@@ -3,9 +3,9 @@
  * https://github.com/simondevyoutube/
  */
 
-import * as THREE from '../node_modules/three/build/three.module.js'
-import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js"
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js"
+import * as THREE from 'three/build/three.module.js'
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 const _VS = `
 varying vec3 vWorldPosition;
@@ -290,7 +290,7 @@ class WalkState extends State {
       this._currentAnimationAction.reset().fadeIn(0.5).play();
     }
   }
-  
+
   Enter(prevState, animations) {
     const curAction = animations["walk01"];
     if (prevState) {
@@ -390,7 +390,7 @@ class ThirdPersonCamera {
 
   // To follow the character
   Update(timeElapsed, target) {
-   
+
     if (!this._enabled) {
       // Camera is disabled
       return;
@@ -492,7 +492,7 @@ class AnimalCrossing {
     // Load 3d object
     this._LoadMap();
     this._LoadAnimatedModel();
-    
+
     // Create ThirdPersonCamera
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
@@ -588,13 +588,13 @@ class AnimalCrossing {
   }
 
   // Create a planemesh containing a picture of your name and information
-  _CreaetNameView(rectanglePosition){
-    if(this.isRectangleVisible){
+  _CreaetNameView(rectanglePosition) {
+    if (this.isRectangleVisible) {
       this._scene.remove(this.planeMesh);
     }
     // Create a rectangle geometry
-    const width = 20; 
-    const height = 12; 
+    const width = 20;
+    const height = 12;
     const planeGeometry = new THREE.PlaneGeometry(width, height);
 
 
@@ -617,31 +617,31 @@ class AnimalCrossing {
   _NameView() {
     this.isRectangleVisible;
     if (this._controls.target.position) {
-        const targetPosition = this._controls.target.position;
+      const targetPosition = this._controls.target.position;
 
-        const xInRange = targetPosition.x >= 60 && targetPosition.x <= 70;
-        const yInRange = targetPosition.y >= 1 && targetPosition.y <= 2;
-        const zInRange = targetPosition.z >= 30 && targetPosition.z <= 40;
+      const xInRange = targetPosition.x >= 60 && targetPosition.x <= 70;
+      const yInRange = targetPosition.y >= 1 && targetPosition.y <= 2;
+      const zInRange = targetPosition.z >= 30 && targetPosition.z <= 40;
 
-        if (xInRange && yInRange && zInRange) {
-            console.log("Target is within the specified range.");
+      if (xInRange && yInRange && zInRange) {
+        console.log("Target is within the specified range.");
 
-            const cameraPosition = this._camera.position.clone();
-            const rectanglePosition = targetPosition.clone().add(cameraPosition).divideScalar(2);
-            
-            this._CreaetNameView(rectanglePosition, this.isRectangleVisible);
+        const cameraPosition = this._camera.position.clone();
+        const rectanglePosition = targetPosition.clone().add(cameraPosition).divideScalar(2);
 
-            console.log("Target position:", targetPosition);
-            console.log("Rectangle position:", rectanglePosition);
+        this._CreaetNameView(rectanglePosition, this.isRectangleVisible);
 
-            this.isRectangleVisible = true;
-       
-        } else { 
-            this._scene.remove(this.planeMesh);
-    
-            console.log("Target is outside the specified range.");
-            console.log("Target position:", targetPosition);
-        }
+        console.log("Target position:", targetPosition);
+        console.log("Rectangle position:", rectanglePosition);
+
+        this.isRectangleVisible = true;
+
+      } else {
+        this._scene.remove(this.planeMesh);
+
+        console.log("Target is outside the specified range.");
+        console.log("Target position:", targetPosition);
+      }
     }
   }
 
@@ -691,7 +691,7 @@ class AnimalCrossing {
       // If there is an object in front of you
       const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
 
-      if (frontDistance <= minFrontDistance) { this.check = 1;}
+      if (frontDistance <= minFrontDistance) { this.check = 1; }
     }
   }
 

@@ -67,14 +67,6 @@ window.onload = function init() {
       cabin.position.setY(-4);
       plane.rotation.y = 1;
 
-      // cabin.traverse((child)=>{
-      //   if(child.isMesh){
-      //     child.material = child.material.clone();
-      //     child.material.map = texture;
-      //   }
-      // });
-      // groupRef.current.add(cabin);
-
       scene.add(cabin);
 
       animate();
@@ -203,41 +195,6 @@ window.onload = function init() {
       }, 1000); // 5000 밀리초 (5초) 지연
     }
   }
-
-  // var menuClick = function (url) {
-  //   if (url == '/tiny_cabin_view') {
-  //     location.reload(true);
-  //     return;
-  //   }
-
-  //   $.ajax({
-  //     type: 'POST',
-  //     url: url,
-  //     async: false,
-  //     data: "",
-  //     contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-  //     success: function (data) {
-  //       $('#Container').html(data);
-
-  //       if (isMenuHide) menuOff();
-  //     },
-  //     error: function (request, status, error) {
-  //       alert(error);
-  //     }
-  //   });
-  // };
-  // var menuClick = function (url) {
-  //   // AJAX 요청을 통해 데이터를 받아옵니다.
-  //   $.get(url, function (data) {
-  //     // 받아온 데이터를 페이지에 적용합니다.
-  //     $('#Container').html(data);
-  //     // 페이지의 일부분만 업데이트했으므로, 히스토리를 업데이트합니다.
-  //     history.pushState(null, null, url);
-  //     if (isMenuHide) menuOff();
-  //   });
-  // };
-
-
 
   function handleResize() {
     const canvas = document.getElementById("gl-canvas");

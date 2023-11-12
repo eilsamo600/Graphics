@@ -51,6 +51,28 @@ window.onload = function init() {
 	});
 
 	const loader = new THREE.GLTFLoader();
+
+	loader.load(
+		"resources/map/map_ball.glb",
+		function (gltf) {
+			cabin = gltf.scene;
+			cabin.scale.set(11, 11, 11);
+			cabin.position.setY(-4);
+			//plane.rotation.y = 1;
+
+			scene.add(cabin);
+			if (this.cabin) {
+				this.cabin.visible = !this.cabin.visible;
+			}
+
+			//animate();
+		},
+		undefined,
+		function (error) {
+			console.error(error);
+		}
+	);
+
 	loader.load('resources/paper_plane/scene.gltf', function (gltf) {
 		plane = gltf.scene;
 
@@ -139,10 +161,11 @@ window.onload = function init() {
 
 			if (plane) {
 
+
 				// 5초 후에 페이지 이동
-				setTimeout(function () {
-					window.location.href = "./tiny_cabin_view.html"; // 새로운 페이지로 이동
-				}, 4500); // 5000 밀리초 (5초) 지연
+				// setTimeout(function () {
+				// 	window.location.href = "./tiny_cabin_view.html"; // 새로운 페이지로 이동
+				// }, 4500); // 5000 밀리초 (5초) 지연
 			}
 
 		}
@@ -174,6 +197,9 @@ window.onload = function init() {
 
 				if (plane.position.x >= 120) {
 					clearInterval(interval2);
+					if (this.cabin) {
+						this.cabin.visible = !this.cabin.visible;
+					}
 				}
 			}, 23);
 

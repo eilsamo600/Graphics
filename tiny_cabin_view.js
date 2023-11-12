@@ -42,9 +42,9 @@ window.onload = function init() {
   uniforms["topColor"].value.copy(hemiLight.color);
 
   // 빛을 생성합니다. (색상, 세기)
-  // const light = new THREE.PointLight(0xffffff, 3);
-  // light.position.set(1, 1, 1); // 빛의 위치를 조절합니다.
-  // scene.add(light); // 빛을 씬에 추가합니다.
+  const light = new THREE.PointLight(0x002fff, 3);
+  light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
+  scene.add(light); // 빛을 씬에 추가합니다.
 
   scene.add(new THREE.AmbientLight(0x303030, 9));
 

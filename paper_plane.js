@@ -234,6 +234,55 @@ window.onload = function init() {
 		handleMouseClick();
 
 	});
+
+
+	if (this.cabin.visible && cabin) {
+		const fov = 60;
+		const aspect = 1920 / 1080;
+		const near = 1.0;
+		const far = 1000.0;
+
+		camera = new THREE.PerspectiveCamera(
+			fov,
+			aspect,
+			near,
+			far
+		);
+		camera.position.set(25, 10, 25);
+
+		const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
+		hemiLight.color.setHSL(0.6, 1, 0.6);
+		hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+
+		scene.add(hemiLight)
+
+		const hlight = new THREE.AmbientLight(0x404040, 1);
+		scene.add(hlight);
+
+		const uniforms = {
+			"topColor": { value: new THREE.Color(0x0077ff) },
+			"bottomColor": { value: new THREE.Color(0xffffff) },
+			"offset": { value: 33 },
+			"exponent": { value: 0.6 }
+		};
+		uniforms["topColor"].value.copy(hemiLight.color);
+
+		// 빛을 생성합니다. (색상, 세기)
+		light = new THREE.PointLight(0x002fff, 3);
+		light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
+		scene.add(light); // 빛을 씬에 추가합니다.
+
+		scene.add(new THREE.AmbientLight(0x303030, 9));
+
+		//controls = new THREE.OrbitControls(camera, renderer.domElement);
+		//const controls2 = new MapControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+
+		controls.enableRotate = true; //마우스로 움직이는거 함
+		controls.enableZoom = true; //마우스로 확대축소 함
+	}
+
+
 }
 
 

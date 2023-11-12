@@ -30,7 +30,7 @@ void main() {
   gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
 }`;
 
-
+// BasicCharacterController class for controlling a 3D character
 class BasicCharacterController {
   constructor(params) {
     this._Init(params);
@@ -51,7 +51,7 @@ class BasicCharacterController {
 
   }
 
-
+  // Load 3D model and animations for the character
   _LoadModels() {
     const loader = new GLTFLoader();
     loader.load('../resources/marshal/marshal.glb', (gltf) => {
@@ -74,6 +74,7 @@ class BasicCharacterController {
     });
   }
 
+  // Update method to handle character movement and animation
   Update(timeInSeconds, check) {
     if (this.target == null) {
       return;
@@ -81,6 +82,7 @@ class BasicCharacterController {
 
     this._stateMachine.Update(timeInSeconds, this._input);
 
+    // Handle character deceleration
     const velocity = this._velocity;
     const frameDecceleration = new THREE.Vector3(
       velocity.x * this._decceleration.x,
@@ -136,7 +138,7 @@ class BasicCharacterController {
     sideways.multiplyScalar(velocity.x * timeInSeconds);
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
-    // console.log(check);
+    // Return characters if they are in front of the wall
     if (check == 1) {
       return;
     } else {
@@ -153,11 +155,13 @@ class BasicCharacterController {
   }
 };
 
+// BasicCharacterControllerInput class for handling user input
 class BasicCharacterControllerInput {
   constructor() {
     this._Init();
   }
 
+  // Initialize input handling
   _Init() {
     this._keys = {
       forward: false,
@@ -204,6 +208,7 @@ class BasicCharacterControllerInput {
   }
 }
 
+// FiniteStateMachine class for managing states and transitions
 class FiniteStateMachine {
   constructor() {
     this._states = {};
@@ -240,7 +245,7 @@ class FiniteStateMachine {
   }
 };
 
-
+// CharacterFSM class for managing character-specific states
 class CharacterFSM extends FiniteStateMachine {
   constructor(animations) {
     super();
@@ -254,7 +259,7 @@ class CharacterFSM extends FiniteStateMachine {
   }
 };
 
-
+// Status Inheritance Class
 class State {
   constructor(parent) {
     this._parent = parent;
@@ -266,7 +271,7 @@ class State {
 };
 
 
-
+// Class for walk state 
 class WalkState extends State {
   constructor(parent) {
     super(parent);
@@ -285,6 +290,7 @@ class WalkState extends State {
       this._currentAnimationAction.reset().fadeIn(0.5).play();
     }
   }
+  
   Enter(prevState, animations) {
     const curAction = animations["walk01"];
     if (prevState) {
@@ -309,7 +315,7 @@ class WalkState extends State {
 };
 
 
-
+// Class for Idle state 
 class IdleState extends State {
   constructor(parent) {
     super(parent);
@@ -382,6 +388,7 @@ class ThirdPersonCamera {
     this._enabled = false;
   }
 
+  // To follow the character
   Update(timeElapsed, target) {
    
     if (!this._enabled) {
@@ -425,6 +432,7 @@ class AnimalCrossing {
       this._OnWindowResize();
     }, false);
 
+    // Make basic camera and light
     const fov = 60;
     const aspect = 1920 / 1080;
     const near = 1.0;
@@ -445,11 +453,10 @@ class AnimalCrossing {
     const listener = new THREE.AudioListener();
     this._scene.add(listener);
 
+    // Part to play the sound
     const sound = new THREE.Audio(listener);
-
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load('./sounds/animal_crossing.ogg', (buffer) => {
-      //const sound = new THREE.Audio(this._controls.listener);
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);
@@ -457,6 +464,7 @@ class AnimalCrossing {
     });
 
 
+    // Make sky mesh
     const uniforms = {
       "topColor": { value: new THREE.Color(0x0077ff) },
       "bottomColor": { value: new THREE.Color(0xffffff) },
@@ -479,19 +487,20 @@ class AnimalCrossing {
     this._scene.add(sky);
 
 
-
     this._previousRAF = null;
 
+    // Load 3d object
     this._LoadMap();
     this._LoadAnimatedModel();
-  
+    
+    // Create ThirdPersonCamera
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
     this._CreateOrbitControls();
 
 
-    // 추가: R 키 눌렀을 때 카메라 전환 변수
+    // Camera transition variables when R key is pressed
     this._isOrbitCamera = false;
 
     const hlight = new THREE.AmbientLight(0x404040, 50);
@@ -501,12 +510,14 @@ class AnimalCrossing {
 
   }
 
+  // For Resize
   _OnWindowResize() {
     this._camera.aspect = window.innerWidth / window.innerHeight;
     this._camera.updateProjectionMatrix();
     this._threejs.setSize(window.innerWidth, window.innerHeight);
   }
 
+  // Funtion for call every seconds; 
   _RAF() {
     requestAnimationFrame((t) => {
       if (this._previousRAF === null) {
@@ -522,6 +533,7 @@ class AnimalCrossing {
     });
   }
 
+  // Load Map object
   _LoadMap() {
     const loader = new GLTFLoader();
 
@@ -536,6 +548,7 @@ class AnimalCrossing {
     });
   }
 
+  // Load marshal model
   _LoadAnimatedModel() {
     const params = {
       camera: this._camera,
@@ -544,6 +557,8 @@ class AnimalCrossing {
     this._controls = new BasicCharacterController(params);
 
   }
+
+  // Create orbjtcontrol for free viewpoints
   _CreateOrbitControls() {
     this._orbitControls = new OrbitControls(this._camera, this._threejs.domElement);
     this._orbitControls.enableDamping = true;
@@ -556,6 +571,7 @@ class AnimalCrossing {
     this._orbitControls.enabled = false;
   }
 
+  // Function to switch the camera
   _ToggleCameraMode() {
     this._isOrbitCamera = !this._isOrbitCamera;
 
@@ -571,6 +587,7 @@ class AnimalCrossing {
     }
   }
 
+  // Create a planemesh containing a picture of your name and information
   _CreaetNameView(rectanglePosition){
     if(this.isRectangleVisible){
       this._scene.remove(this.planeMesh);
@@ -595,6 +612,8 @@ class AnimalCrossing {
     this.planeMesh.rotation.copy(cameraRotation);
 
   }
+
+  // Functions that show the name and information when the target comes to the location
   _NameView() {
     this.isRectangleVisible;
     if (this._controls.target.position) {
@@ -626,14 +645,13 @@ class AnimalCrossing {
     }
   }
 
-
+  // Ray Function for Physical Operations
   _RayForCollision() {
-
     if (!this.model) {
       return;
     }
 
-    //ray for ground
+    // Ray for ground
     const raycaster = new THREE.Raycaster();
     const characterPosition = this._controls.target.position;
     raycaster.set(characterPosition, new THREE.Vector3(0, -1, 0));
@@ -655,48 +673,29 @@ class AnimalCrossing {
       this._controls.target.position.y += 0.1;
     }
 
+    // Ray for front
     const frontRaycaster = new THREE.Raycaster();
-    const backRaycaster = new THREE.Raycaster();
 
     const frontRayDirection = new THREE.Vector3(0, 0, 1);
     frontRayDirection.applyQuaternion(this._controls.target.quaternion);
 
-    const backRayDirection = new THREE.Vector3(0, 0, -1);
-    backRayDirection.applyQuaternion(this._controls.target.quaternion);
 
     frontRaycaster.set(characterPosition, frontRayDirection);
     const frontIntersections = frontRaycaster.intersectObject(this.model);
 
     backRaycaster.set(characterPosition, backRayDirection);
-    const backIntersections = backRaycaster.intersectObject(this.model);
 
     const minFrontDistance = 0.5;
-    const maxBackDistance = 0.5;
-
-
 
     if (frontIntersections.length > 0) {
-      // 앞쪽에 장애물이 있을 경우
+      // If there is an object in front of you
       const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
 
-      let oldPosition;
-      if (frontDistance <= minFrontDistance) {
-       
-        this.check = 1;
-      }
+      if (frontDistance <= minFrontDistance) { this.check = 1;}
     }
-
-    // if (backIntersections.length > 0) {
-    //   // 뒤쪽에 장애물이 있을 경우
-    //   const backDistance = characterPosition.distanceTo(backIntersections[0].point);
-    //   console.log("뒤에 거리:"+backDistance);
-    //   if (backDistance <= maxBackDistance) {
-    //     // 뒤로 이동을 제한
-    //     this.check = 1;
-    //   }
-    // }
   }
 
+  // Function that contains functions that run every second
   _Step(timeElapsed) {
     const timeElapsedS = timeElapsed * 0.001;
     this.check = 0;
@@ -709,14 +708,11 @@ class AnimalCrossing {
       // this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
       this._RayForCollision();
-
     }
 
     if (this._controls) {
       this._controls.Update(timeElapsedS, this.check);
     }
-
-
   }
 
   _OnKeyDown(event) {

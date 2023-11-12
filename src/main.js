@@ -383,9 +383,9 @@ class ThirdPersonCamera {
   }
 
   Update(timeElapsed, target) {
-    // console.log(this._enabled);
+   
     if (!this._enabled) {
-      // Camera is disabled, do not update
+      // Camera is disabled
       return;
     }
 
@@ -482,8 +482,9 @@ class AnimalCrossing {
 
     this._previousRAF = null;
 
-    this._loadMap();
+    this._LoadMap();
     this._LoadAnimatedModel();
+  
     this._thirdPersonCamera = new ThirdPersonCamera({
       camera: this._camera,
     });
@@ -495,11 +496,8 @@ class AnimalCrossing {
 
     const hlight = new THREE.AmbientLight(0x404040, 50);
     this._scene.add(hlight);
-    // const light = new THREE.PointLight(0xc4c4c4,10);
-    // light.position.set(0,3000,5000);
-    // this._scene.add(light);
 
-    this._RAF();//
+    this._RAF();
 
   }
 
@@ -524,7 +522,7 @@ class AnimalCrossing {
     });
   }
 
-  _loadMap() {
+  _LoadMap() {
     const loader = new GLTFLoader();
 
     loader.load('resources/map/ACmap.glb', (glb) => {
@@ -572,6 +570,62 @@ class AnimalCrossing {
       this._thirdPersonCamera.Enable();
     }
   }
+
+  _CreaetNameView(rectanglePosition){
+    if(this.isRectangleVisible){
+      this._scene.remove(this.planeMesh);
+    }
+    // Create a rectangle geometry
+    const width = 20; 
+    const height = 12; 
+    const planeGeometry = new THREE.PlaneGeometry(width, height);
+
+
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('name2.png');
+
+    const planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+    this.planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    this._scene.add(this.planeMesh);
+
+    this.planeMesh.position.copy(rectanglePosition);
+
+    const cameraRotation = this._camera.rotation.clone();
+    this.planeMesh.rotation.copy(cameraRotation);
+
+  }
+  _NameView() {
+    this.isRectangleVisible;
+    if (this._controls.target.position) {
+        const targetPosition = this._controls.target.position;
+
+        const xInRange = targetPosition.x >= 60 && targetPosition.x <= 70;
+        const yInRange = targetPosition.y >= 1 && targetPosition.y <= 2;
+        const zInRange = targetPosition.z >= 30 && targetPosition.z <= 40;
+
+        if (xInRange && yInRange && zInRange) {
+            console.log("Target is within the specified range.");
+
+            const cameraPosition = this._camera.position.clone();
+            const rectanglePosition = targetPosition.clone().add(cameraPosition).divideScalar(2);
+            
+            this._CreaetNameView(rectanglePosition, this.isRectangleVisible);
+
+            console.log("Target position:", targetPosition);
+            console.log("Rectangle position:", rectanglePosition);
+
+            this.isRectangleVisible = true;
+       
+        } else { 
+            this._scene.remove(this.planeMesh);
+    
+            console.log("Target is outside the specified range.");
+            console.log("Target position:", targetPosition);
+        }
+    }
+  }
+
 
   _RayForCollision() {
 
@@ -624,10 +678,10 @@ class AnimalCrossing {
     if (frontIntersections.length > 0) {
       // 앞쪽에 장애물이 있을 경우
       const frontDistance = characterPosition.distanceTo(frontIntersections[0].point);
-      // console.log("앞에 거리:" + frontDistance);
+
       let oldPosition;
       if (frontDistance <= minFrontDistance) {
-        // 앞으로 이동을 제한
+       
         this.check = 1;
       }
     }
@@ -652,8 +706,8 @@ class AnimalCrossing {
 
     if (this._controls.target != null) {
 
+      // this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
       this._thirdPersonCamera.Update(timeElapsedS, this._controls.target);
-
       this._RayForCollision();
 
     }
@@ -670,6 +724,8 @@ class AnimalCrossing {
       case 82: // R
         this._ToggleCameraMode();
         break;
+      case 84: // T
+        this._NameView();
     }
   }
 
@@ -680,3 +736,6 @@ let _APP = null;
 window.addEventListener('DOMContentLoaded', () => {
   _APP = new AnimalCrossing();
 });
+
+
+

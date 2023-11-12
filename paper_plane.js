@@ -23,9 +23,9 @@ window.onload = function init() {
 	camera.position.z = 10;
 
 	// 빛을 생성합니다. (색상, 세기)
-	const light = new THREE.PointLight(0xFFFFFF, 1);
-	light.position.set(-30, 4, -10); // 빛의 위치를 조절합니다.
-	scene.add(light); // 빛을 씬에 추가합니다.
+	const light1 = new THREE.PointLight(0xFFFFFF, 1);
+	light1.position.set(-30, 4, -10); // 빛의 위치를 조절합니다.
+	scene.add(light1); // 빛을 씬에 추가합니다.
 
 	scene.add(new THREE.AmbientLight(0xdde4f0));
 
@@ -56,8 +56,8 @@ window.onload = function init() {
 		"resources/map/map_ball.glb",
 		function (gltf) {
 			cabin = gltf.scene;
-			cabin.scale.set(11, 11, 11);
-			cabin.position.setY(-4);
+			cabin.scale.set(7, 7, 7);
+			cabin.position.setY(-1);
 			//plane.rotation.y = 1;
 
 			scene.add(cabin);
@@ -198,7 +198,9 @@ window.onload = function init() {
 					clearInterval(interval2);
 					if (this.cabin) {
 						this.cabin.visible = !this.cabin.visible;
-						console.log("cabin");
+						//console.log("cabin");
+						scene.remove(plane);
+						scene.remove(light1);
 
 						// Change 'const' to 'let'
 						let fov = 60;
@@ -233,7 +235,7 @@ window.onload = function init() {
 						uniforms["topColor"].value.copy(hemiLight.color);
 
 						// 빛을 생성합니다. (색상, 세기)
-						let light = new THREE.PointLight(0x002fff, 3);
+						const light = new THREE.PointLight(0x002fff, 3);
 						light.position.set(1, 0, 1); // 빛의 위치를 조절합니다.
 						scene.add(light); // 빛을 씬에 추가합니다.
 
@@ -276,6 +278,7 @@ window.onload = function init() {
 		camera.position.x = 0;
 		camera.position.y = 10;
 		camera.position.z = 10;
+
 
 
 		const interval = setInterval(() => {

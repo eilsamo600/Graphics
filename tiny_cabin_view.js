@@ -197,9 +197,9 @@ window.onload = function init() {
       window.removeEventListener("dblclick", handleMouseMove);
 
       setTimeout(function () {
-        //window.location.href = "./index.html"; // 새로운 페이지로 이동
+        window.location.href = "./index.html"; // 새로운 페이지로 이동
 
-        movePage('. /index.html');
+        // movePage('. /index.html');
       }, 1000); // 5000 밀리초 (5초) 지연
     }
   }
@@ -226,16 +226,16 @@ window.onload = function init() {
   //     }
   //   });
   // };
-  var menuClick = function (url) {
-    // AJAX 요청을 통해 데이터를 받아옵니다.
-    $.get(url, function (data) {
-      // 받아온 데이터를 페이지에 적용합니다.
-      $('#Container').html(data);
-      // 페이지의 일부분만 업데이트했으므로, 히스토리를 업데이트합니다.
-      history.pushState(null, null, url);
-      if (isMenuHide) menuOff();
-    });
-  };
+  // var menuClick = function (url) {
+  //   // AJAX 요청을 통해 데이터를 받아옵니다.
+  //   $.get(url, function (data) {
+  //     // 받아온 데이터를 페이지에 적용합니다.
+  //     $('#Container').html(data);
+  //     // 페이지의 일부분만 업데이트했으므로, 히스토리를 업데이트합니다.
+  //     history.pushState(null, null, url);
+  //     if (isMenuHide) menuOff();
+  //   });
+  // };
 
 
 

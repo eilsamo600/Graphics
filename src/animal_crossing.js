@@ -55,6 +55,9 @@ class BasicCharacterController {
   _LoadModels() {
     const loader = new GLTFLoader();
     loader.load('../resources/marshal/marshal.glb', (gltf) => {
+      gltf.scene.traverse(c => {
+        c.castShadow = true;
+      });
       this.target = gltf.scene;
 
       this.target.position.set(0, 1, 0);
@@ -432,6 +435,8 @@ class AnimalCrossing {
       this._OnWindowResize();
     }, false);
 
+    
+
     // Make basic camera and light
     const fov = 60;
     const aspect = 1920 / 1080;
@@ -439,15 +444,35 @@ class AnimalCrossing {
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     this._camera.position.set(25, 10, 25);
+    this._camera.castShadow = true;
+    this._camera.receiveShadow = true;
 
     this._scene = new THREE.Scene();
 
     this._scene.background = new THREE.Color(0xFFFFFF);
     this._scene.fog = new THREE.FogExp2(0x89b2eb, 0.002);
 
+    let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+    light.position.set(-100, 100, 100);
+    light.target.position.set(0, 0, 0);
+    light.castShadow = true;
+    light.shadow.bias = -0.001;
+    light.shadow.mapSize.width = 4096;
+    light.shadow.mapSize.height = 4096;
+    light.shadow.camera.near = 0.1;
+    light.shadow.camera.far = 500.0;
+    light.shadow.camera.near = 0.5;
+    light.shadow.camera.far = 500.0;
+    light.shadow.camera.left = 50;
+    light.shadow.camera.right = -50;
+    light.shadow.camera.top = 50;
+    light.shadow.camera.bottom = -50;
+    this._scene.add(light);
+
     const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFFF, 0.6);
     hemiLight.color.setHSL(0.6, 1, 0.6);
     hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+    hemiLight.castShadow = true;
     this._scene.add(hemiLight);
 
     const listener = new THREE.AudioListener();
@@ -460,7 +485,7 @@ class AnimalCrossing {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);
-      sound.play();
+      // sound.play();
     });
 
 
@@ -538,11 +563,22 @@ class AnimalCrossing {
     const loader = new GLTFLoader();
 
     loader.load('resources/map/ACmap.glb', (glb) => {
+      glb.scene.traverse(c => {
+        c.castShadow = true;
+      });
       this.model = glb.scene;
 
       this.model.position.set(-50, 0, 50);
       this.model.scale.set(15, 15, 15);
       this.model.rotation.set(0, 0, 0);
+      this.model.castShadow = true;
+      this.model.receiveShadow = true;
+      this.model.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
 
       this._scene.add(this.model);
     });
@@ -555,7 +591,6 @@ class AnimalCrossing {
       scene: this._scene,
     }
     this._controls = new BasicCharacterController(params);
-
   }
 
   // Create orbjtcontrol for free viewpoints
